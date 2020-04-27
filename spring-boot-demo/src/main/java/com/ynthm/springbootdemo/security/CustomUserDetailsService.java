@@ -11,28 +11,30 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(s).orElseThrow(() ->
-                new UsernameNotFoundException("User not found with username or email : " + s));
-        return UserPrincipal.create(user);
-    }
+  @Override
+  public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    User user =
+        userRepository
+            .findByUsername(s)
+            .orElseThrow(
+                () ->
+                    new UsernameNotFoundException("User not found with username or email : " + s));
+    return UserPrincipal.create(user);
+  }
 
-    @Transactional
-    public UserDetails loadUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", id)
-        );
+  @Transactional
+  public UserDetails loadUserById(Long id) {
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
-        return UserPrincipal.create(user);
-    }
+    return UserPrincipal.create(user);
+  }
 }

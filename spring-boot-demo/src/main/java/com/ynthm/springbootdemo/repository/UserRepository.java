@@ -7,17 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmail(String email);
+  Optional<User> findByEmail(String email);
 
-    List<User> findByIdIn(List<Long> userIds);
+  List<User> findByIdIn(List<Long> userIds);
 
-    Optional<User> findByUsername(String username);
+  Optional<User> findByUsername(String username);
 
-    boolean existsByEmail(String email);
+  boolean existsByEmail(String email);
 }

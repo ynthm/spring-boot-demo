@@ -19,71 +19,58 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Collections;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @Service
 public class UserService {
 
+  @Autowired AuthenticationManager authenticationManager;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+  @Autowired UserRepository userRepository;
 
-    @Autowired
-    UserRepository userRepository;
+  @Autowired RoleRepository roleRepository;
 
-    @Autowired
-    RoleRepository roleRepository;
+  @Autowired PasswordEncoder passwordEncoder;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+  @Autowired JwtTokenProvider tokenProvider;
 
-    @Autowired
-    JwtTokenProvider tokenProvider;
-
-
-    public User register(User userToAdd) {
-        final String username = userToAdd.getUsername();
-        if (userRepository.findByUsername(username) != null) {
-            return null;
-        }
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        final String rawPassword = userToAdd.getPassword();
-        userToAdd.setPassword(encoder.encode(rawPassword));
-        userToAdd.setUpdatedAt(Instant.now());
-
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
-
-        userToAdd.setRoles(Collections.singleton(userRole));
-
-        return userRepository.save(userToAdd);
+  public User register(User userToAdd) {
+    final String username = userToAdd.getUsername();
+    if (userRepository.findByUsername(username) != null) {
+      return null;
     }
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    final String rawPassword = userToAdd.getPassword();
+    userToAdd.setPassword(encoder.encode(rawPassword));
+    userToAdd.setUpdatedAt(Instant.now());
 
-    public String login(User user) {
+    Role userRole =
+        roleRepository
+            .findByName(RoleName.ROLE_USER)
+            .orElseThrow(() -> new AppException("User Role not set."));
 
+    userToAdd.setRoles(Collections.singleton(userRole));
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getUsername(),
-                        user.getPassword()
-                )
-        );
+    return userRepository.save(userToAdd);
+  }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+  public String login(User user) {
 
-        return tokenProvider.generateToken(authentication);
-    }
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
-    public String refresh(String oldToken) {
-//        final String token = oldToken.substring(tokenHead.length());
-//        String username = jwtTokenUtil.getUsernameFromToken(token);
-//        JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(username);
-//        if (jwtTokenUtil.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
-//            return jwtTokenUtil.refreshToken(token);
-//        }
-        return null;
-    }
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
+    return tokenProvider.generateToken(authentication);
+  }
 
+  public String refresh(String oldToken) {
+    //        final String token = oldToken.substring(tokenHead.length());
+    //        String username = jwtTokenUtil.getUsernameFromToken(token);
+    //        JwtUser user = (JwtUser) userDetailsService.loadUserByUsername(username);
+    //        if (jwtTokenUtil.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
+    //            return jwtTokenUtil.refreshToken(token);
+    //        }
+    return null;
+  }
 }

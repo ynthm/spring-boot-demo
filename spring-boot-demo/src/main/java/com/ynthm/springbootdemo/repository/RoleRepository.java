@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @Repository
 public interface RoleRepository extends JpaRepository<Role, String> {
 
-    Optional<Role> findByName(RoleName roleName);
+  Optional<Role> findByName(RoleName roleName);
 }

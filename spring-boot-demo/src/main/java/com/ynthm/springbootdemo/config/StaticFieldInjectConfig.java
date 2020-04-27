@@ -7,17 +7,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @Component
 public class StaticFieldInjectConfig {
 
-    @Autowired
-    private MessageSource messageSource;
+  @Autowired private MessageSource messageSource;
 
-    @PostConstruct
-    private void init() {
-        CheckUtil.setResources(messageSource);
-    }
+  @PostConstruct
+  private void init() {
+    CheckUtil.setResources(messageSource);
+  }
 }

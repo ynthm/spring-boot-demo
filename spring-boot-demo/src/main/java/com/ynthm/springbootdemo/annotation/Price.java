@@ -6,10 +6,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.lang.annotation.*;
 
-/**
- * Author : Ynthm
- * 组合方式定制化的 constraint
- */
+/** Author : Ynthm 组合方式定制化的 constraint */
 @Min(0)
 @Max(10000)
 @Constraint(validatedBy = {})
@@ -17,9 +14,9 @@ import java.lang.annotation.*;
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Price {
-    String message() default "错误的价格";
+  String message() default "错误的价格";
 
-    Class<?>[] groups() default {};
+  Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+  Class<? extends Payload>[] payload() default {};
 }

@@ -29,69 +29,66 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+  @Autowired AuthenticationManager authenticationManager;
 
-    @Autowired
-    UserRepository userRepository;
+  @Autowired UserRepository userRepository;
 
-    @Autowired
-    RoleRepository roleRepository;
+  @Autowired RoleRepository roleRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+  @Autowired PasswordEncoder passwordEncoder;
 
-    @Autowired
-    JwtTokenProvider tokenProvider;
+  @Autowired JwtTokenProvider tokenProvider;
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  @PostMapping("/signin")
+  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    String jwt = tokenProvider.generateToken(authentication);
+    return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+  }
+
+  @PostMapping("/signup")
+  public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+
+    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+      return new ResponseEntity(
+          new ApiResponse(false, "Email Address already in use!"), HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    // Creating user's account
+    User user =
+        new User(
+            signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword());
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
-                    HttpStatus.BAD_REQUEST);
-        }
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // Creating user's account
-        User user = new User(signUpRequest.getUsername(),
-                signUpRequest.getEmail(), signUpRequest.getPassword());
+    Role userRole =
+        roleRepository
+            .findByName(RoleName.ROLE_USER)
+            .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    user.setRoles(Collections.singleton(userRole));
 
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
+    User result = userRepository.save(user);
 
-        user.setRoles(Collections.singleton(userRole));
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path("/api/users/{username}")
+            .buildAndExpand(result.getUsername())
+            .toUri();
 
-        User result = userRepository.save(user);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/users/{username}")
-                .buildAndExpand(result.getUsername()).toUri();
-
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
-    }
+    return ResponseEntity.created(location)
+        .body(new ApiResponse(true, "User registered successfully"));
+  }
 }

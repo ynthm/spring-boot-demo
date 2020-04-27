@@ -1,23 +1,23 @@
-//package com.ynthm.springbootdemo.handler;
+// package com.ynthm.springbootdemo.handler;
 //
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.web.servlet.error.ErrorAttributes;
-//import org.springframework.boot.web.servlet.error.ErrorController;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RestController;
-//import org.springframework.web.context.request.ServletWebRequest;
-//import org.springframework.web.context.request.WebRequest;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.web.servlet.error.ErrorAttributes;
+// import org.springframework.boot.web.servlet.error.ErrorController;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.web.context.request.ServletWebRequest;
+// import org.springframework.web.context.request.WebRequest;
 //
-//import javax.servlet.http.HttpServletRequest;
-//import java.util.Map;
+// import javax.servlet.http.HttpServletRequest;
+// import java.util.Map;
 //
-///**
+/// **
 // * Author : Ynthm
 // */
-//@RestController
-//public class BaseErrorRestController implements ErrorController {
+// @RestController
+// public class BaseErrorRestController implements ErrorController {
 //    private static final String PATH = "/error";
 //
 //    @Autowired
@@ -37,7 +37,8 @@
 //    }
 //
 //
-//    protected Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
+//    protected Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean
+// includeStackTrace) {
 //        WebRequest webRequest = new ServletWebRequest(request);
 //        return this.errorAttributes.getErrorAttributes(webRequest, includeStackTrace);
 //    }
@@ -54,4 +55,4 @@
 //            }
 //        }
 //    }
-//}
+// }

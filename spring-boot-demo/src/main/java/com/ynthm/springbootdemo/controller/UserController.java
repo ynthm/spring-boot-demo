@@ -18,44 +18,45 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Author : Ynthm
- */
+/** Author : Ynthm */
 @RestController
 public class UserController {
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+  private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ApiResult<String> login(HttpSession session, @Validated @RequestBody User user) {
-        logger.info("login user:" + user.getUserName());
+  @RequestMapping(value = "/login", method = RequestMethod.POST)
+  public ApiResult<String> login(HttpSession session, @Validated @RequestBody User user) {
+    logger.info("login user:" + user.getUserName());
 
-        if (user.getUserName() == null) {
-            throw new ApiException(ErrorCode.NO_LOGIN);
-        }
-
-        // TODO 只是模拟登陆
-        session.setAttribute(UserContentUtil.KEY_USER, user.getUserName());
-
-        return new ApiResult<>(user.getUserName());
+    if (user.getUserName() == null) {
+      throw new ApiException(ErrorCode.NO_LOGIN);
     }
 
-    @GetMapping(params = {"page", "size"}, value = "/list")
-    public List<User> findPaginated(@RequestParam("page") int page,
-                                    @RequestParam("size") int size, UriComponentsBuilder uriBuilder,
-                                    HttpServletResponse response) {
+    // TODO 只是模拟登陆
+    session.setAttribute(UserContentUtil.KEY_USER, user.getUserName());
 
-        List<User> userList = new ArrayList<>();
-        Page<User> resultPage = new PageImpl<>(userList);
-        if (page > resultPage.getTotalPages()) {
-            throw new ApiException(ErrorCode.VALIDATE_FAILED);
-        }
+    return new ApiResult<>(user.getUserName());
+  }
 
-        return resultPage.getContent();
+  @GetMapping(
+      params = {"page", "size"},
+      value = "/list")
+  public List<User> findPaginated(
+      @RequestParam("page") int page,
+      @RequestParam("size") int size,
+      UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+
+    List<User> userList = new ArrayList<>();
+    Page<User> resultPage = new PageImpl<>(userList);
+    if (page > resultPage.getTotalPages()) {
+      throw new ApiException(ErrorCode.VALIDATE_FAILED);
     }
 
+    return resultPage.getContent();
+  }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
+  @GetMapping("/hello")
+  public String hello() {
+    return "hello";
+  }
 }
