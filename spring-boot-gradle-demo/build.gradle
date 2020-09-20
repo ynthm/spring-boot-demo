@@ -1,0 +1,27 @@
+description = "Spring Boot Demo"
+
+allprojects {
+    apply plugin: 'java'
+    group = 'com.ynthm.spring'
+
+    repositories {
+        //mavenCentral()
+        maven { url "https://maven.aliyun.com/repository/central" }
+        maven { url "http://localhost:8081/repository/maven-public/" }
+    }
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:1.18.12"
+        annotationProcessor "org.projectlombok:lombok:1.18.12"
+        testAnnotationProcessor "org.projectlombok:lombok:1.18.12"
+        testCompileOnly "org.projectlombok:lombok:1.18.12"
+    }
+}
+
+project(':common') {
+}
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+

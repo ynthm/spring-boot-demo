@@ -1,0 +1,61 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id "java-library"
+    id 'maven-publish'
+}
+
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    compile project(":common")
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    //implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    // https://mvnrepository.com/artifact/com.lmax/disruptor
+    compile group: 'com.lmax', name: 'disruptor', version: '3.4.2'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'mysql:mysql-connector-java'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+// https://mvnrepository.com/artifact/cn.hutool/hutool-core
+    compile group: 'cn.hutool', name: 'hutool-core', version: '5.4.1'
+
+
+    // https://mvnrepository.com/artifact/com.googlecode.libphonenumber/libphonenumber
+    compile group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.9'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+configurations.all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
+
+publishing {
+    publications {
+        myLibrary(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            def releasesRepoUrl = "http://localhost:8081/repository/maven-releases"
+            def snapshotsRepoUrl = "http://localhost:8081/repository/maven-snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = 'admin'
+                password = 'wang0804'
+            }
+        }
+    }
+}
