@@ -1,0 +1,6 @@
+server:
+  port: 8888
+  shutdown: graceful
+spring:
+  profiles:
+    active: @profile.env@
