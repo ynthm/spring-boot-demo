@@ -1,28 +1,21 @@
 package com.ynthm.validator.demo.common.validator;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import lombok.Data;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
-/** @author ethan */
-@Target({TYPE, ANNOTATION_TYPE})
-@Retention(RUNTIME)
-@Constraint(validatedBy = PhoneNumberValidator.class)
-public @interface PhoneNumber {
-  String message() default "{constraints.phone.number.rightful}";
+/**
+ * @author Ynthm Wang
+ * @version 1.0
+ */
+@Data
+@VerifyPhoneNumber
+public class PhoneNumber {
+  @Min(value = 0)
+  private Integer areaCode;
 
-  Class<?>[] groups() default {};
-
-  Class<? extends Payload>[] payload() default {};
-
-  /** @return The first field */
-  String areaCode() default "areaCode";
-
-  /** @return The second field */
-  String phoneNumber() default "phoneNumber";
+  @Min(value = 0)
+  @NotNull
+  private Long phoneNumber;
 }

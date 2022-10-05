@@ -1,7 +1,7 @@
 package com.ynthm.common.web.entity;
 
-import com.ynthm.common.web.groups.Create;
-import com.ynthm.common.web.groups.Update;
+import com.ynthm.common.web.validator.groups.Create;
+import com.ynthm.common.web.validator.groups.Update;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 

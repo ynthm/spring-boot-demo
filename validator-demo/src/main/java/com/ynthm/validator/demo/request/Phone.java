@@ -1,6 +1,6 @@
 package com.ynthm.validator.demo.request;
 
-import com.ynthm.validator.demo.common.validator.PhoneNumber;
+import com.ynthm.validator.demo.common.validator.VerifyPhoneNumber;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 /** @author ethan */
 @Data
-@PhoneNumber(groups = Phone.SendVerificationCode.class)
+@VerifyPhoneNumber(groups = Phone.SendVerificationCode.class)
 public class Phone {
 
   /**

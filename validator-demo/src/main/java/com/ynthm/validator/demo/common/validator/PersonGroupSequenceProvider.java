@@ -18,11 +18,13 @@ public class PersonGroupSequenceProvider implements DefaultGroupSequenceProvider
 
     if (object != null) {
       Integer age = object.getAge();
-      log.info("年龄为：" + age + "，执行对应校验逻辑");
-      if (age >= 20 && age < 30) {
-        defaultGroupSequence.add(Person.WhenAge20And30Group.class);
-      } else if (age >= 30 && age < 40) {
-        defaultGroupSequence.add(Person.WhenAge30And40Group.class);
+      if (age != null) {
+        log.info("年龄为：" + age + "，执行对应校验逻辑");
+        if (age >= 20 && age < 30) {
+          defaultGroupSequence.add(Person.WhenAge20And30Group.class);
+        } else if (age >= 30 && age < 40) {
+          defaultGroupSequence.add(Person.WhenAge30And40Group.class);
+        }
       }
     }
     return defaultGroupSequence;

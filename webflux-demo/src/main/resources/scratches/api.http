@@ -1,0 +1,42 @@
+POST http://localhost:8080/person
+Content-Type: application/json
+
+{
+  "name": "Ethan",
+  "age": 18
+}
+
+###
+
+GET http://localhost:8080/hello
+Accept: application/json
+
+###
+
+###
+GET http://localhost:8080/persons
+
+
+###
+PUT http://localhost:8080/persons
+Content-Type: application/json
+
+{
+  "id": "1",
+  "name": "liu",
+  "age": 18
+}
+
+###
+
+
+GET http://localhost:8080/test
+Accept: application/json
+
+###
+
+
+GET http://localhost:8080/test/one
+Accept: application/json
+
+###

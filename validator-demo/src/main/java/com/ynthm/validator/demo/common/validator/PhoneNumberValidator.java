@@ -1,40 +1,40 @@
 package com.ynthm.validator.demo.common.validator;
 
-import cn.hutool.core.bean.BeanUtil;
+import com.ynthm.validator.demo.common.ResultCode;
+import com.ynthm.validator.demo.common.exception.BaseException;
 import com.ynthm.validator.demo.common.util.PhoneUtil;
+import com.ynthm.validator.demo.common.util.ValidationUtil;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /** @author ethan */
-public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, Object> {
-
-  private String areaCodeField;
-  private String phoneNumberField;
+public class PhoneNumberValidator implements ConstraintValidator<VerifyPhoneNumber, PhoneNumber> {
 
   @Override
-  public void initialize(PhoneNumber constraintAnnotation) {
-    this.areaCodeField = constraintAnnotation.areaCode();
-    this.phoneNumberField = constraintAnnotation.phoneNumber();
-  }
-
-  @Override
-  public boolean isValid(Object value, ConstraintValidatorContext context) {
+  public boolean isValid(PhoneNumber value, ConstraintValidatorContext context) {
     boolean result = false;
     try {
+      final Integer areaCode = value.getAreaCode();
+      final Long phoneNumber = value.getPhoneNumber();
 
-      final Object firstObj = BeanUtil.getProperty(value, areaCodeField);
-      final Object secondObj = BeanUtil.getProperty(value, phoneNumberField);
-      if (firstObj == null || secondObj == null) {
+      if (areaCode == null) {
+        // 自定义验证错误信息
+        ValidationUtil.addMessageToContext(
+            context, "areaCode", "{javax.validation.constraints.NotNull.message}");
         return false;
       }
-      int areaCode = Integer.parseInt(firstObj.toString());
-      Long phoneNumber = Long.parseLong(secondObj.toString());
+
+      if (phoneNumber == null) {
+        ValidationUtil.addMessageToContext(context, "phoneNumber", "请输入参数");
+        return false;
+      }
+
       if (PhoneUtil.checkPhoneNumber(phoneNumber, areaCode)) {
         result = true;
       }
     } catch (final Exception e) {
-      // e
+      throw new BaseException(ResultCode.VALID_ERROR, e);
     }
     return result;
   }

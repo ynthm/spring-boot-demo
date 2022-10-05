@@ -1,0 +1,19 @@
+### 无密码登陆新系统
+POST {{host}}:{{port}}/local/userLink/loginNew
+Content-Type: application/json
+wb-signature: mX1QWNmnf5nNO+OY9oKPdTnYvHx+3vwT4yJTu8Zc+os=
+wb-timestamp: 1663223306528
+
+{
+  "oldUserId": "01343073511f4c3e97d59f2e55e1b4d0"
+}
+
+### 无密码登陆老系统
+POST {{host}}:{{port}}/local/userLink/loginOld
+Content-Type: application/json
+wb-signature: 7q9mHRW82Oin9dt/S9jZbOPu4N7kaqUl27RKSErDfdE=
+wb-timestamp: 123123123
+
+{
+  "username": "admin"
+}

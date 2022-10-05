@@ -166,7 +166,6 @@ public class GlobalExceptionHandler {
    */
   private Result<String> wrapperBindingResult(BindingResult bindingResult) {
     StringBuilder msg = new StringBuilder();
-
     for (ObjectError error : bindingResult.getAllErrors()) {
       msg.append(", ");
       if (error instanceof FieldError) {

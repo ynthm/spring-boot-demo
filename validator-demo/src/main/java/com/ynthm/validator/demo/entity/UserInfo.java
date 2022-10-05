@@ -1,6 +1,6 @@
 package com.ynthm.validator.demo.entity;
 
-import com.ynthm.validator.demo.common.groups.Update;
+import com.ynthm.validator.demo.common.validator.groups.Update;
 import com.ynthm.validator.demo.common.validator.IdentityCardNumber;
 import org.hibernate.validator.constraints.URL;
 

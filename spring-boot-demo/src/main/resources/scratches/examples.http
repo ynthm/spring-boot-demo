@@ -1,0 +1,58 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection) or
+# paste cURL into the file and request will be converted to HTTP Request format.
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+GET http://httpbin.org/image/jpeg
+
+> {%
+    client.log(response.body);
+%}
+
+###
+GET {{baseUrl}}/excel
+Accept: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+
+<> {{save_dir}}/test.json
+
+###
+# 产品列表
+GET {{baseUrl}}/admin/symbols
+Authorization: {{auth_token}}
+Content-Type: application/json
+
+
+###
+# 添加产品
+POST {{baseUrl}}/admin/symbols
+Authorization: {{auth_token}}
+Content-Type: application/json
+
+{
+  "symbolCode": "BTC2USDTw100",
+  "type": 5
+}
+
+###
+# 修改产品
+POST {{baseUrl}}/admin/symbols/140
+Authorization: {{auth_token}}
+Content-Type: application/json
+
+{
+  "symbolCode": "test2test1111",
+  "displayname": "123",
+  "type": 5
+}
+
+###
+# 删除产品
+DELETE {{baseUrl}}/admin/symbols/138
+Authorization: {{auth_token}}
+Content-Type: application/json
+
+###

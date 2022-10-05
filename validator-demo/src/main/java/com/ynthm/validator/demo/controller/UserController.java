@@ -1,8 +1,8 @@
 package com.ynthm.validator.demo.controller;
 
 import com.ynthm.validator.demo.common.Result;
-import com.ynthm.validator.demo.common.groups.Create;
-import com.ynthm.validator.demo.common.groups.Update;
+import com.ynthm.validator.demo.common.validator.groups.Create;
+import com.ynthm.validator.demo.common.validator.groups.Update;
 import com.ynthm.validator.demo.entity.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

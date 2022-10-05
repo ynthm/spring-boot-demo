@@ -1,8 +1,8 @@
-description = "Spring Boot Demo"
+description = "Ynthm Common Package"
 
 allprojects {
     apply plugin: 'java'
-    group = 'com.ynthm.spring'
+    group = 'com.ynthm.common'
 
     repositories {
         //mavenCentral()

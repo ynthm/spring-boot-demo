@@ -1,0 +1,26 @@
+### 切换租户到公司
+POST {{host}}:{{port}}/open/tenantLink/switchTenantOld
+Content-Type: application/json
+
+{
+  "tenantId": 1564880863966052354
+}
+
+### 切换公司到租户
+POST {{host}}:{{port}}/open/tenantLink/switchTenantNew
+Content-Type: application/json
+
+{
+  "list": [
+    {
+      "companyId": "04d7c33735fa42d3a503a568931ccb2c"
+    },
+    {
+      "companyId": "cfe05dd2cedf4dd1ad9475d32838eaf9"
+    },
+    {
+    }
+  ]
+}
+
+###

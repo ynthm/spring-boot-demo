@@ -1,0 +1,51 @@
+{
+  "projectName": "Cross Login",
+  "outPath": "./src/main/resources/static/doc",
+  "allInOneDocFileName": "index.html",
+  "allInOne": true,
+  "createDebugPage": true,
+  "serverUrl": "http://192.168.3.185:8401",
+  "style": "xt256",
+  "revisionLogs": [
+    {
+      "version": "1.0",
+      "revisionTime": "2022-09-16 10:30",
+      "status": "update",
+      "author": "Ethan Wang",
+      "remarks": "接口文档"
+    }
+  ],
+  "dataDictionaries": [
+    {
+      "title": "HmacAlgorithm",
+      "enumClassName": "com.wb.cross.login.enums.HmacAlgorithm",
+      "codeField": "value",
+      "descField": "value"
+    }
+  ],
+  "errorCodeDictionaries": [
+    {
+      "enumClassName": "com.wb.cross.login.enums.BaseResultCode",
+      "codeField": "code",
+      "descField": "message"
+    }
+  ],
+  "requestHeaders": [
+    {
+      "name": "wb-signature",
+      "type": "string",
+      "desc": "signature desc",
+      "value": "signature请求头的值",
+      "required": true,
+      "pathPatterns": "/local/**"
+    },
+    {
+      "name": "wb-timestamp",
+      "type": "string",
+      "desc": "timestamp desc",
+      "value": "timestamp请求头的值",
+      "required": true,
+      "pathPatterns": "/local/**"
+    }
+  ]
+}

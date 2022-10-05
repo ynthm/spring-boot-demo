@@ -1,0 +1,67 @@
+
+
+### 插入 user_link
+POST {{host}}:{{port}}/userLink
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "oldUserId": "01343073511f4c3e97d59f2e55e1b4d0"
+}
+
+### 更新 user_link
+PUT {{host}}:{{port}}/userLink
+Content-Type: application/json
+
+{
+  "id": 3,
+  "userId": 1,
+  "oldUserId": "123123"
+}
+
+
+### 局部更新或插入
+PATCH {{host}}:{{port}}/userLink
+Content-Type: application/json
+
+{
+  "id": 2,
+  "userId": 1,
+  "oldUserId": "222222"
+}
+
+### 插入 user_link
+POST {{host}}:{{port}}/userLink
+Content-Type: application/json
+
+{
+  "username": "youzhiyun",
+  "oldUserId": "218d105f4f68401eb1926b6f3dce065c"
+}
+
+### /userLink/page
+POST {{host}}:{{port}}/userLink/page
+Content-Type: application/json
+
+{
+  "page": 1,
+  "orderItems": [
+    {
+      "column": "createTime",
+      "asc": false
+    }
+  ]
+}
+
+###
+
+### 插入 user_link
+POST {{host}}:{{port}}/userLink
+Content-Type: application/json
+
+{
+  "username": "admin_guang",
+  "oldUserId": "5085bc288cc04127bb850d326b80a676"
+}
+
+###
