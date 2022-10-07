@@ -1,9 +1,9 @@
 package com.ynthm.springbootdemo.service;
 
+import com.ynthm.common.exception.BaseException;
 import com.ynthm.springbootdemo.domain.entity.Role;
 import com.ynthm.springbootdemo.domain.entity.RoleName;
 import com.ynthm.springbootdemo.domain.entity.User;
-import com.ynthm.springbootdemo.exception.AppException;
 import com.ynthm.springbootdemo.repository.RoleRepository;
 import com.ynthm.springbootdemo.repository.UserRepository;
 import com.ynthm.springbootdemo.security.JwtTokenProvider;
@@ -43,10 +43,7 @@ public class UserService {
     userToAdd.setPassword(encoder.encode(rawPassword));
     userToAdd.setUpdatedAt(Instant.now());
 
-    Role userRole =
-        roleRepository
-            .findByName(RoleName.ROLE_USER)
-            .orElseThrow(() -> new AppException("User Role not set."));
+    Role userRole = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(BaseException::new);
 
     userToAdd.setRoles(Collections.singleton(userRole));
 

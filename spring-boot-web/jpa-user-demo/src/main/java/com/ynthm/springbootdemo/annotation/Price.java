@@ -6,7 +6,9 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.lang.annotation.*;
 
-/** Author : Ynthm 组合方式定制化的 constraint */
+/**
+ * @author : Ynthm 组合方式定制化的 constraint
+ */
 @Min(0)
 @Max(10000)
 @Constraint(validatedBy = {})

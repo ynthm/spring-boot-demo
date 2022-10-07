@@ -5,8 +5,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.lang.annotation.*;
 
 /**
- * Author : Ynthm The following CurrentUser annotation is a wrapper around @AuthenticationPrincipal
- * annotation.
+ * The following CurrentUser annotation is a wrapper around @AuthenticationPrincipal
+ *
+ * @author Ynthm Wang.
  */
 @Target({ElementType.PARAMETER, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

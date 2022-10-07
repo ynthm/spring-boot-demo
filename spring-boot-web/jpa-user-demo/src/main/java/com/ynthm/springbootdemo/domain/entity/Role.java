@@ -1,10 +1,15 @@
 package com.ynthm.springbootdemo.domain.entity;
 
+import lombok.Data;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
+import java.util.List;
 
-/** Author : Ynthm */
+/**
+ * @author Ynthm Wang
+ */
+@Data
 @Entity
 @Table(name = "role")
 public class Role {
@@ -17,25 +22,19 @@ public class Role {
   @Column(length = 60)
   private RoleName name;
 
-  public Role() {}
+  /** 角色 -- 权限关系：多对多 */
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "role_permission",
+      joinColumns = {@JoinColumn(name = "role_id")},
+      inverseJoinColumns = {@JoinColumn(name = "permission_id")})
+  private List<Permission> permissions;
 
-  public Role(RoleName name) {
-    this.name = name;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public RoleName getName() {
-    return name;
-  }
-
-  public void setName(RoleName name) {
-    this.name = name;
-  }
+  /** 用户 -- 角色关系：多对多 */
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "user_role",
+      joinColumns = {@JoinColumn(name = "role_id")},
+      inverseJoinColumns = {@JoinColumn(name = "user_id")})
+  private List<User> users;
 }

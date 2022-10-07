@@ -17,7 +17,7 @@ public class I18nUtil {
 
   /**
    * @param code ：对应messages配置的key.
-   * @return
+   * @return message
    */
   public String getMessage(String code) {
     return getMessage(code, null);
@@ -36,7 +36,7 @@ public class I18nUtil {
    * @param code ：对应messages配置的key.
    * @param args : 数组参数.
    * @param defaultMessage : 没有设置key的时候的默认值.
-   * @return
+   * @return message
    */
   public String getMessage(String code, Object[] args, String defaultMessage) {
     Locale locale = UserUtil.getLocale();

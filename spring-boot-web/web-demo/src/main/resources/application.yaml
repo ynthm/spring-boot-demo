@@ -12,6 +12,8 @@ spring:
         url: http://localhost:8900
         instance:
           name: web-demo
+#  jackson:
+#    time-zone: GMT+8
 
 management:
   endpoints:

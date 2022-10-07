@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-/** Author : Ynthm */
+/**
+ * @author Ynthm
+ */
 public class UserPrincipal implements UserDetails {
 
   private Long id;
@@ -92,8 +94,12 @@ public class UserPrincipal implements UserDetails {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     UserPrincipal that = (UserPrincipal) o;
     return Objects.equals(id, that.id);
   }

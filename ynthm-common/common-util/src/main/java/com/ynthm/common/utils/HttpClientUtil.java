@@ -4,8 +4,10 @@ import com.ynthm.common.constant.Constant;
 import com.ynthm.common.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
 import org.apache.hc.client5.http.classic.methods.*;
 import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -41,10 +43,7 @@ import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -66,8 +65,9 @@ public class HttpClientUtil {
       socketFactoryRegistry =
           RegistryBuilder.<ConnectionSocketFactory>create()
               .register("https", sslSocketFactory())
-              .register("http", new PlainConnectionSocketFactory())
+              .register("http", PlainConnectionSocketFactory.INSTANCE)
               .build();
+      // 还有很多可以定义的项目
       cm = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
       cm.setMaxTotal(200);
       cm.setDefaultMaxPerRoute(20);
@@ -107,6 +107,63 @@ public class HttpClientUtil {
         .setDefaultRequestConfig(requestConfig)
         // .setUserTokenHandler((httpRoute, httpContext) -> null)
         .build();
+  }
+
+  final RequestConfig defaultRequestConfig =
+      RequestConfig.custom()
+          .setCookieSpec(StandardCookieSpec.STRICT)
+          .setExpectContinueEnabled(true)
+          .setConnectionRequestTimeout(Timeout.ofSeconds(5))
+          .setConnectTimeout(Timeout.ofSeconds(5))
+          .setTargetPreferredAuthSchemes(
+              Arrays.asList(StandardAuthScheme.NTLM, StandardAuthScheme.DIGEST))
+          // .setProxyPreferredAuthSchemes(Collections.singletonList(StandardAuthScheme.BASIC))
+          .build();
+
+  private final CloseableHttpClient defaultHttpClient =
+      HttpClients.custom()
+          .setConnectionManager(cm)
+          .setDefaultRequestConfig(defaultRequestConfig)
+          // .setUserTokenHandler((httpRoute, httpContext) -> null)
+          .build();
+
+  private CloseableHttpClient getDefaultHttpClient() {
+    return defaultHttpClient;
+  }
+
+  public String get(HttpHost httpHost, String uri) {
+    // Create an HttpClient with the given custom dependencies and configuration.
+    try (CloseableHttpClient httpClient = getDefaultHttpClient()) {
+      final HttpGet httpget = new HttpGet(uri);
+      // Request configuration can be overridden at the request level.
+      // They will take precedence over the one set at the client level.
+      final RequestConfig requestConfig =
+          RequestConfig.copy(defaultRequestConfig)
+              .setConnectionRequestTimeout(Timeout.ofSeconds(5))
+              .setConnectTimeout(Timeout.ofSeconds(5))
+              .build();
+      httpget.setConfig(requestConfig);
+
+      log.debug("Executing request {} {}", httpget.getMethod(), httpget.getUri());
+      return httpClient.execute(httpHost, httpget, responseHandler);
+    } catch (IOException | URISyntaxException e) {
+      throw new BaseException(e);
+    }
+  }
+
+  public String proxyGet(HttpHost proxy, String uri) throws IOException {
+    try (final CloseableHttpClient httpclient = getDefaultHttpClient()) {
+      final HttpGet httpget = new HttpGet(uri);
+      // Request configuration can be overridden at the request level.
+      // They will take precedence over the one set at the client level.
+      final RequestConfig requestConfig =
+          RequestConfig.copy(defaultRequestConfig)
+              .setProxyPreferredAuthSchemes(Collections.singletonList(StandardAuthScheme.BASIC))
+              .setProxy(proxy)
+              .build();
+      httpget.setConfig(requestConfig);
+      return httpclient.execute(httpget, responseHandler);
+    }
   }
 
   public String post(String url, Map<String, String> formParamMap) {
@@ -335,29 +392,20 @@ public class HttpClientUtil {
     return getResult(httpRequest, timeout, isStream, null);
   }
 
-  private static HttpClientResponseHandler<String> responseHandler =
+  final HttpClientResponseHandler<String> responseHandler =
       response -> {
-        int statusCode = response.getCode();
+        final int statusCode = response.getCode();
         if (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES) {
-
           HttpEntity entity = response.getEntity();
-
-          String contentType1 = entity.getContentType();
-          log.info("MineType：" + contentType1);
-
-          return entity != null ? EntityUtils.toString(entity, Constant.CHARSET_UTF_8) : null;
+          log.info("MineType：" + entity.getContentType());
+          return EntityUtils.toString(entity, Constant.CHARSET_UTF_8);
         } // 如果是重定向
         else if (HttpStatus.SC_MOVED_TEMPORARILY == statusCode) {
-          String locationUrl = response.getLastHeader("Location").getValue();
-          //          return getResult(new HttpPost(locationUrl), timeout, isStream);
-
-          return locationUrl;
+          return response.getLastHeader("Location").getValue();
         } else {
           // 响应信息
           String reasonPhrase = response.getReasonPhrase();
-          StringBuilder sb = new StringBuilder();
-          sb.append("code[").append(statusCode).append("],desc[").append(reasonPhrase).append("]");
-          log.warn(sb.toString());
+          log.warn("code[{}],desc[{}]", statusCode, reasonPhrase);
           throw new ClientProtocolException("Unexpected response status: " + statusCode);
         }
       };

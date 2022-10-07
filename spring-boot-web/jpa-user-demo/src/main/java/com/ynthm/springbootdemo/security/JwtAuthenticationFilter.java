@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/** Author : Ynthm */
+/**
+ * @author Ynthm Wang
+ */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Value("${app.jwt.authHead}")

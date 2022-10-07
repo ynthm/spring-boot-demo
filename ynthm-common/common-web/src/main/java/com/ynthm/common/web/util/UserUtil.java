@@ -12,6 +12,10 @@ import java.util.Locale;
  */
 public class UserUtil {
 
+  public static final String KEY_LANG = "lang";
+
+  public static final String KEY_USER = "user";
+
   private UserUtil() {}
 
   private static final ThreadLocal<IUser> TL_USER = new ThreadLocal<>();
@@ -21,8 +25,6 @@ public class UserUtil {
           () ->
               // 语言的默认值
               Locale.SIMPLIFIED_CHINESE);
-
-  public static final String KEY_USER = "user";
 
   public static void setUser(IUser user) {
     TL_USER.set(user);

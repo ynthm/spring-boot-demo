@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="warn">
+    <properties>
+        <property name="LOG_LEVEL">debug</property>
+        <property name="LOG_HOME">/tmp/log/validator</property>
+
+        <property name="PROJECT_NAME">validator</property>
+        <property name="PATTERN">%d{ABSOLUTE} %highlight{%-5p} [%t [%c{1.}---%m%n%throwable</property>
+    </properties>
+    <!-- 控制台输出 -->
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+        <!--RollingRandomAccessFile-->
+        <RollingRandomAccessFile name="${PROJECT_NAME}" fileName="${LOG_HOME}//${PROJECT_NAME}.log"
+                                 filePattern="${LOG_HOME}//${PROJECT_NAME}-%d.log">
+            <PatternLayout pattern="${PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="ERROR-FILE" filePattern="${LOG_HOME}/${PROJECT_NAME}-error-%d.log">
+            <PatternLayout pattern="${PATTERN}"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <Loggers>
+        <AsyncLogger name="com.ynthm.validator" additivity="false" level="${LOG_LEVEL}">
+            <AppenderRef ref="CONSOLE"/>
+            <!-- <AppenderRef ref="ERROR-FILE"/>-->
+            <AppenderRef ref="${PROJECT_NAME}"/>
+        </AsyncLogger>
+
+        <AsyncRoot level="info">
+            <!--<AppenderRef ref="RollingRandomAccessFile"/>-->
+            <AppenderRef ref="${PROJECT_NAME}"/>
+            <AppenderRef ref="CONSOLE"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>

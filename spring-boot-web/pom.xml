@@ -24,6 +24,7 @@
 
     <modules>
         <module>validator-demo</module>
+        <module>spring-jdbc-demo</module>
         <module>jpa-demo</module>
         <module>jpa-mysql-demo</module>
         <module>jpa-user-demo</module>
@@ -197,6 +198,18 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <plugin>
                 <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
                 <groupId>org.apache.maven.plugins</groupId>

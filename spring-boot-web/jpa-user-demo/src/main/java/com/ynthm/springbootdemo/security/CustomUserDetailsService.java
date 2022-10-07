@@ -1,7 +1,6 @@
 package com.ynthm.springbootdemo.security;
 
 import com.ynthm.springbootdemo.domain.entity.User;
-import com.ynthm.springbootdemo.exception.ResourceNotFoundException;
 import com.ynthm.springbootdemo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,9 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Transactional
   public UserDetails loadUserById(Long id) {
     User user =
-        userRepository
-            .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException(id.toString()));
 
     return UserPrincipal.create(user);
   }

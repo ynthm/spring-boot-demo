@@ -1,7 +1,7 @@
 package com.ynthm.demo.security.controller;
 
-import com.ynthm.demo.security.entity.User;
-import com.ynthm.demo.security.repository.UserRepository;
+import com.ynthm.demo.security.user.User;
+import com.ynthm.demo.security.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,6 @@ public class MainController {
 
     User n = new User();
     n.setName(name);
-    n.setEmail(email);
     userRepository.save(n);
     return "Saved";
   }

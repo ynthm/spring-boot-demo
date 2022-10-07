@@ -1,10 +1,11 @@
 package com.ynthm.springbootdemo.controller;
 
+import com.ynthm.common.domain.Result;
+import com.ynthm.common.enums.BaseResultCode;
+import com.ynthm.common.exception.BaseException;
 import com.ynthm.springbootdemo.domain.entity.Role;
 import com.ynthm.springbootdemo.domain.entity.RoleName;
 import com.ynthm.springbootdemo.domain.entity.User;
-import com.ynthm.springbootdemo.exception.AppException;
-import com.ynthm.springbootdemo.payload.ApiResponse;
 import com.ynthm.springbootdemo.payload.JwtAuthenticationResponse;
 import com.ynthm.springbootdemo.payload.LoginRequest;
 import com.ynthm.springbootdemo.payload.SignUpRequest;
@@ -45,7 +46,8 @@ public class AuthController {
   @Autowired JwtTokenProvider tokenProvider;
 
   @PostMapping("/signin")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<Result<JwtAuthenticationResponse>> authenticateUser(
+      @Valid @RequestBody LoginRequest loginRequest) {
 
     Authentication authentication =
         authenticationManager.authenticate(
@@ -55,15 +57,15 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     String jwt = tokenProvider.generateToken(authentication);
-    return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    return ResponseEntity.ok(Result.ok(new JwtAuthenticationResponse(jwt)));
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+  public ResponseEntity<Result<Void>> registerUser(
+      @Valid @RequestBody SignUpRequest signUpRequest) {
 
     if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-      return new ResponseEntity(
-          new ApiResponse(false, "Email Address already in use!"), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(Result.error(BaseResultCode.DB_EXIST), HttpStatus.BAD_REQUEST);
     }
 
     // Creating user's account
@@ -73,10 +75,7 @@ public class AuthController {
 
     user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-    Role userRole =
-        roleRepository
-            .findByName(RoleName.ROLE_USER)
-            .orElseThrow(() -> new AppException("User Role not set."));
+    Role userRole = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(BaseException::new);
 
     user.setRoles(Collections.singleton(userRole));
 
@@ -88,7 +87,6 @@ public class AuthController {
             .buildAndExpand(result.getUsername())
             .toUri();
 
-    return ResponseEntity.created(location)
-        .body(new ApiResponse(true, "User registered successfully"));
+    return ResponseEntity.created(location).body(Result.ok());
   }
 }

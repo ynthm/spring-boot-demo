@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.Locale;
 
@@ -110,11 +111,6 @@ public class TimeUtil {
     return of.toInstant().toEpochMilli();
   }
 
-  public static LocalDateTime getDateTimeOfMilli(long timestamp, ZoneId at) {
-    Instant instant = Instant.ofEpochMilli(timestamp);
-    return LocalDateTime.ofInstant(instant, at);
-  }
-
   public static long getTimestamp(LocalDateTime localDateTime, ZoneId at) {
     Instant instant = localDateTime.atZone(at).toInstant();
     return instant.toEpochMilli();
@@ -153,5 +149,26 @@ public class TimeUtil {
     DateTimeFormatter f =
         DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
     return f.withLocale(lo).format(ZonedDateTime.ofInstant(ins, zoneId));
+  }
+
+  /** 取本月第一天 */
+  public static LocalDate firstDayOfThisMonth() {
+    LocalDate today = LocalDate.now();
+    return today.with(TemporalAdjusters.firstDayOfMonth());
+  }
+  /** 取本月最后一天 */
+  public static LocalDate lastDayOfThisMonth() {
+    LocalDate today = LocalDate.now();
+    return today.with(TemporalAdjusters.lastDayOfMonth());
+  }
+
+  /** 取本月第一天的开始时间 */
+  public static LocalDateTime startOfThisMonth() {
+    return LocalDateTime.of(firstDayOfThisMonth(), LocalTime.MIN);
+  }
+
+  /** 取本月最后一天的结束时间 */
+  public static LocalDateTime endOfThisMonth() {
+    return LocalDateTime.of(lastDayOfThisMonth(), LocalTime.MAX);
   }
 }
