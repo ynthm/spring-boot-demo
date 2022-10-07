@@ -107,7 +107,7 @@ public class ServletUtil {
     response.setCharacterEncoding(Constant.UTF_8);
     try {
       // 这里URLEncoder.encode可以防止中文乱码
-      fileName = URLEncoder.encode(fileName, Constant.UTF_8).replaceAll("\\+", "%20");
+      fileName = URLEncoder.encode(fileName, Constant.UTF_8).replace("\\+", "%20");
     } catch (UnsupportedEncodingException e) {
       log.error("encoding filename error.", e);
     }

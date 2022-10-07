@@ -30,8 +30,7 @@ public class RestTemplateConfig {
    */
   @Bean
   public RestTemplate httpRestTemplate() {
-    RestTemplate restTemplate = new RestTemplate(httpRequestFactory());
-    return restTemplate;
+    return new RestTemplate(httpRequestFactory());
   }
 
   public ClientHttpRequestFactory httpRequestFactory() {
@@ -41,7 +40,7 @@ public class RestTemplateConfig {
   /**
    * Http 客户端 可设置代理拦截器
    *
-   * @return
+   * @return OkHttpClient
    */
   public OkHttpClient okHttpConfigClient() {
     return new OkHttpClient()

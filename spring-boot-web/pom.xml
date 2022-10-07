@@ -19,15 +19,23 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.7.4</spring-boot.version>
         <testcontainers.version>1.14.3</testcontainers.version>
+        <spring-boot-admin.version>2.7.5</spring-boot-admin.version>
     </properties>
 
     <modules>
+        <module>validator-demo</module>
         <module>jpa-demo</module>
         <module>jpa-mysql-demo</module>
         <module>jpa-user-demo</module>
+        <module>mybatis-demo</module>
         <module>mybatis-plus-demo</module>
         <module>mybatis-tk-demo</module>
         <module>web-demo</module>
+        <module>elasticsearch-demo</module>
+        <module>kafka-demo</module>
+        <module>mongodb-demo</module>
+        <module>admin-server</module>
+        <module>mvn-resource-isolate</module>
 
     </modules>
 
@@ -60,6 +68,11 @@
             <dependency>
                 <groupId>com.ynthm.common</groupId>
                 <artifactId>common-web</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ynthm.common</groupId>
+                <artifactId>common-validation</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -123,12 +136,49 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/de.codecentric -->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-dependencies</artifactId>
+                <version>${spring-boot-admin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <build>
         <pluginManagement>
-
             <plugins>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>

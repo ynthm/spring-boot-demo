@@ -13,6 +13,7 @@ public enum BaseResultCode implements ResultCode, ResultExceptionAssert {
   /** OK */
   OK(0, "OK"),
   ERROR(-1, "ERROR"),
+  WARN(1, "WARN"),
 
   NULL(998, "系统错误 NULL"),
   UNKNOWN_ERROR(999, "Unknown Error!"),

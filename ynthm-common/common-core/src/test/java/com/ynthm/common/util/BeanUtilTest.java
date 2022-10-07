@@ -1,5 +1,7 @@
 package com.ynthm.common.util;
 
+import lombok.Data;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -8,45 +10,19 @@ import org.junit.jupiter.api.Test;
  */
 class BeanUtilTest {
 
-  @Test
-  void setPropertyIntroSpector() {}
-
-  @Test
-  void getPropertyIntroSpector() {}
-
-  @Test
-  void setProperty() {}
-
-  @Test
-  void getProperty() {}
-
-  class User {
+  @Data
+  static class User {
     private String name;
     private int age;
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public int getAge() {
-      return age;
-    }
-
-    public void setAge(int age) {
-      this.age = age;
-    }
   }
 
   @Test
-  void test() throws Exception {
+  void test() {
     User user = new User();
     BeanUtil.setProperty(User.class, user, "name", "Ethan Wang");
     BeanUtil.setPropertyIntroSpector(User.class, user, "age", 18);
-    System.out.println(BeanUtil.getPropertyIntroSpector(User.class, user, "name"));
-    System.out.println(BeanUtil.getProperty(User.class, user, "age"));
+    Assertions.assertEquals(
+        "Ethan Wang", BeanUtil.getPropertyIntroSpector(User.class, user, "name"));
+    Assertions.assertEquals(18, BeanUtil.getProperty(User.class, user, "age"));
   }
 }

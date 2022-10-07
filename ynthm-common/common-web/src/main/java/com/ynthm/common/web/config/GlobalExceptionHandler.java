@@ -1,6 +1,7 @@
 package com.ynthm.common.web.config;
 
 import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
 import com.ynthm.common.domain.Result;
@@ -15,15 +16,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -45,27 +46,29 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.util.WebUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.validation.ValidationException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author Ethan
+ * 全局异常处理
+ *
+ * @author Ynthm Wang
  */
 @Slf4j
-@Component
 @RestControllerAdvice
+@AutoConfigureBefore(ErrorMvcAutoConfiguration.class)
 public class GlobalExceptionHandler extends BasicErrorController {
 
   public static final String MESSAGE = "message";
   private ObjectMapper objectMapper;
 
-  @Autowired
+  @Resource
   public void setObjectMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
@@ -93,7 +96,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     log.error(
         MoreObjects.toStringHelper("error")
             .add("url", request.getRequestURI())
-            .add("message", e.getMessage())
+            .add(MESSAGE, e.getMessage())
             .toString(),
         e);
 
@@ -101,7 +104,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
   }
 
   @ExceptionHandler(value = CarryDataException.class)
-  public Result<Object> handleBaseException(CarryDataException e) {
+  public Result<String> handleBaseException(CarryDataException e) {
     log.error(e.getLocalizedMessage(), e);
 
     return e.getResult();
@@ -133,18 +136,23 @@ public class GlobalExceptionHandler extends BasicErrorController {
    * @return 自定义的返回实体类
    */
   @Override
-  public ResponseEntity error(HttpServletRequest request) {
+  public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
     HttpStatus status = getStatus(request);
+    Map<String, Object> result = new HashMap<>(3);
     if (status == HttpStatus.NO_CONTENT) {
-      return new ResponseEntity<>(
-          Result.restResult(null, status.value(), status.getReasonPhrase()), status);
+      result.put(Result.FIELD_CODE, status.value());
+      result.put(Result.FIELD_MESSAGE, status.getReasonPhrase());
+      return new ResponseEntity<>(result, status);
     }
     Map<String, Object> body =
         getErrorAttributes(request, getErrorAttributeOptions(request, MediaType.ALL));
     log.error("controller before exception: {}; ", body);
     Object message = body.get(MESSAGE);
+    result.put(Result.FIELD_CODE, status.value());
+    result.put(Result.FIELD_MESSAGE, message.toString());
+    result.put(Result.FIELD_DATA, body);
 
-    return ResponseEntity.ok().body(Result.restResult(body, status.value(), message.toString()));
+    return ResponseEntity.ok().body(result);
   }
 
   @Override
@@ -155,7 +163,15 @@ public class GlobalExceptionHandler extends BasicErrorController {
             request, this.getErrorAttributeOptions(request, MediaType.TEXT_HTML));
     log.error("controller before exception: {}; ", body);
     Object message = body.get(MESSAGE);
-    throw new CarryDataException(Result.restResult(body, status.value(), message.toString()));
+
+    String jsonBody;
+    try {
+      jsonBody = objectMapper.writeValueAsString(body);
+    } catch (JsonProcessingException e) {
+      throw new BaseException(e);
+    }
+
+    throw new CarryDataException(Result.restResult(jsonBody, status.value(), message.toString()));
   }
 
   @SneakyThrows
@@ -190,7 +206,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     AsyncRequestTimeoutException.class
   })
   @ResponseBody
-  public ResponseEntity<Result<Object>> handleServletException(
+  public ResponseEntity<Result<String>> handleServletException(
       Exception ex, HttpServletRequest request) {
     log.error(ex.getMessage(), ex);
 
@@ -200,7 +216,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
 
     String message = body.get(MESSAGE).toString();
 
-    Result<Object> result;
+    Result<String> result;
     HttpHeaders headers = new HttpHeaders();
 
     // MissingServletRequestParameterException ServletRequestBindingException TypeMismatchException
@@ -294,7 +310,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
    * @return 异常结果
    */
   @ExceptionHandler(value = {BindException.class, MethodArgumentNotValidException.class})
-  public Result<List<BindError>> handleValidException(MethodArgumentNotValidException e) {
+  public Result<ArrayList<BindError>> handleValidException(MethodArgumentNotValidException e) {
     log.error(e.getLocalizedMessage(), e);
     HttpStatus status = HttpStatus.BAD_REQUEST;
     return Result.restResult(
@@ -324,7 +340,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
    * @param bindingResult 绑定结果
    * @return 异常结果
    */
-  private List<BindError> wrapperBindingResult(BindingResult bindingResult) {
+  private ArrayList<BindError> wrapperBindingResult(BindingResult bindingResult) {
     return bindingResult.getAllErrors().stream()
         .map(
             error -> {
@@ -339,7 +355,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
                     .setMessage(error.getDefaultMessage());
               }
             })
-        .collect(Collectors.toList());
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
@@ -352,6 +368,8 @@ public class GlobalExceptionHandler extends BasicErrorController {
   public Result<String> handleException(Exception e) {
     if (e instanceof JacksonException) {
       return Result.error(BaseResultCode.ERROR, ((JacksonException) e).getOriginalMessage());
+    } else if (e instanceof ValidationException) {
+      return Result.restResult(null, HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage());
     }
     log.error(ExceptionUtil.printStackTrace(e));
     return Result.error(BaseResultCode.ERROR, getMessage(e));

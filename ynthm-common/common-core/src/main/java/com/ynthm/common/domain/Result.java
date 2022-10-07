@@ -5,8 +5,6 @@ import com.ynthm.common.enums.ResultCode;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-
 /**
  * 响应信息主体
  *
@@ -14,8 +12,11 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class Result<T> implements Serializable {
-  private static final long serialVersionUID = 1L;
+public class Result<T> {
+
+  public static final String FIELD_CODE = "code";
+  public static final String FIELD_MESSAGE = "msg";
+  public static final String FIELD_DATA = "data";
 
   private int code;
 
@@ -36,6 +37,10 @@ public class Result<T> implements Serializable {
 
   public static <T> Result<T> ok() {
     return restResult(null, BaseResultCode.OK.getCode(), BaseResultCode.OK.getMessage());
+  }
+
+  public static <T> Result<T> warn(String message) {
+    return restResult(null, BaseResultCode.WARN.getCode(), message);
   }
 
   public static <T> Result<T> error(ResultCode errorCode) {

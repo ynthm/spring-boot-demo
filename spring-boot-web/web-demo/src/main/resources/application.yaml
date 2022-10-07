@@ -2,5 +2,24 @@ server:
   port: 8801
 
 spring:
+  application:
+    name: web-demo
   profiles:
     active: dev
+  boot:
+    admin:
+      client:
+        url: http://localhost:8900
+        instance:
+          name: web-demo
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true

@@ -9,6 +9,7 @@ import com.ynthm.common.domain.PageResp;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -48,5 +49,10 @@ public class PageUtil {
         .setTotal((int) page.getTotal())
         .setTotalPage((int) page.getPages())
         .setRecords(page.getRecords());
+  }
+
+  public static <T extends Serializable, P extends Serializable> PageResp<T> page(
+      Function<IPage<T>, Page<T>> func, PageReq<P> req) {
+    return from(func.apply(pageable(req)));
   }
 }
