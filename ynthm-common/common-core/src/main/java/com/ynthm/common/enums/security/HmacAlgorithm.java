@@ -1,4 +1,4 @@
-package com.ynthm.common.enums;
+package com.ynthm.common.enums.security;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

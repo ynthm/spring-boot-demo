@@ -171,7 +171,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
       throw new BaseException(e);
     }
 
-    throw new CarryDataException(Result.restResult(jsonBody, status.value(), message.toString()));
+    throw new CarryDataException(Result.of(jsonBody, status.value(), message.toString()));
   }
 
   @SneakyThrows
@@ -181,8 +181,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
 
     return ResponseEntity.ok(
-        objectMapper.writeValueAsString(
-            Result.restResult(null, status.value(), status.getReasonPhrase())));
+        objectMapper.writeValueAsString(Result.of(null, status.value(), status.getReasonPhrase())));
   }
 
   /**
@@ -261,7 +260,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
       request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex);
     }
 
-    result = Result.restResult(null, httpStatus.value(), message);
+    result = Result.of(null, httpStatus.value(), message);
 
     return ResponseEntity.ok().headers(headers).body(result);
   }
@@ -313,7 +312,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
   public Result<ArrayList<BindError>> handleValidException(MethodArgumentNotValidException e) {
     log.error(e.getLocalizedMessage(), e);
     HttpStatus status = HttpStatus.BAD_REQUEST;
-    return Result.restResult(
+    return Result.of(
         wrapperBindingResult(e.getBindingResult()), status.value(), status.getReasonPhrase());
   }
 
@@ -369,7 +368,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     if (e instanceof JacksonException) {
       return Result.error(BaseResultCode.ERROR, ((JacksonException) e).getOriginalMessage());
     } else if (e instanceof ValidationException) {
-      return Result.restResult(null, HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage());
+      return Result.of(null, HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage());
     }
     log.error(ExceptionUtil.printStackTrace(e));
     return Result.error(BaseResultCode.ERROR, getMessage(e));

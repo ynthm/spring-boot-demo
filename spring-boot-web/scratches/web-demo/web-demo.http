@@ -1,1 +1,13 @@
-POST {{baseUrl}}}/actuator/shutdown
+POST {{baseUrl}}/actuator/shutdown
+
+###
+
+GET {{baseUrl}}/feignclient/test
+Accept: application/json
+
+###
+
+GET {{baseUrl}}/feignclient/https
+Accept: application/json
+
+###

@@ -26,12 +26,14 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.Timeout;
 
 import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
@@ -43,6 +45,7 @@ import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -78,10 +81,19 @@ public class HttpClientUtil {
 
   private SSLConnectionSocketFactory sslSocketFactory()
       throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+    return new SSLConnectionSocketFactory(sslContext(), NoopHostnameVerifier.INSTANCE);
+  }
+
+  private SSLContext sslContext()
+      throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
     TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-    SSLContext sslContext =
-        SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-    return new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+    return SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+  }
+
+  private SSLContext sslContext(File file, String storePassword)
+      throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException,
+          KeyManagementException {
+    return SSLContextBuilder.create().loadTrustMaterial(file, storePassword.toCharArray()).build();
   }
 
   private static class SingletonHolder {

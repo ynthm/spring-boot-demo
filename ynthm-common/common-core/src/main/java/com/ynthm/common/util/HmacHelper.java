@@ -1,6 +1,6 @@
 package com.ynthm.common.util;
 
-import com.ynthm.common.enums.HmacAlgorithm;
+import com.ynthm.common.enums.security.HmacAlgorithm;
 import com.ynthm.common.exception.BaseException;
 
 import javax.crypto.Mac;

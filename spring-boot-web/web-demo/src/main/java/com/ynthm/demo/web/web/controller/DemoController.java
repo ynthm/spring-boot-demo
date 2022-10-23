@@ -1,6 +1,7 @@
 package com.ynthm.demo.web.web.controller;
 
 import com.ynthm.demo.web.web.domain.TimeTestResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,5 +40,29 @@ public class DemoController {
   @PostMapping("/time")
   public void post(@RequestBody TimeTestResponse timeTestResponse) {
     System.out.println(timeTestResponse);
+  }
+
+  private FeignClientDemo feignClientDemo;
+
+  @Autowired
+  public void setFeignClientDemo(FeignClientDemo feignClientDemo) {
+    this.feignClientDemo = feignClientDemo;
+  }
+
+  private FeignClientHttps feignClientHttps;
+
+  @Autowired
+  public void setFeignClientHttps(FeignClientHttps feignClientHttps) {
+    this.feignClientHttps = feignClientHttps;
+  }
+
+  @GetMapping("/feignclient/test")
+  public void feign() {
+    feignClientDemo.test();
+  }
+
+  @GetMapping("/feignclient/https")
+  public void feign2() {
+    feignClientHttps.test();
   }
 }

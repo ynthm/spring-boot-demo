@@ -1,7 +1,7 @@
 package com.ynthm.common.utils;
 
 import com.google.common.base.MoreObjects;
-import com.ynthm.common.enums.HmacAlgorithm;
+import com.ynthm.common.enums.security.HmacAlgorithm;
 import com.ynthm.common.util.HmacHelper;
 import com.ynthm.common.util.HmacUtil;
 import org.junit.jupiter.api.Test;

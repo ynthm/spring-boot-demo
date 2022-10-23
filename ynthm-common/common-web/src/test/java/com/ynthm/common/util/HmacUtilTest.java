@@ -1,7 +1,7 @@
 package com.ynthm.common.util;
 
 import com.google.common.base.MoreObjects;
-import com.ynthm.common.enums.HmacAlgorithm;
+import com.ynthm.common.enums.security.HmacAlgorithm;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

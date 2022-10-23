@@ -1,25 +1,19 @@
 package com.ynthm.common.util;
 
+import com.google.common.base.Strings;
+import com.ynthm.common.constant.Constant;
+import com.ynthm.common.enums.security.CipherAlgorithm;
+import com.ynthm.common.enums.security.SignatureAlgorithm;
 import com.ynthm.common.exception.UtilException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Enumeration;
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * @author ETHAN WANG
@@ -27,151 +21,26 @@ import java.util.Enumeration;
 @Slf4j
 public class RsaUtil {
 
-  /** 指定字符集 */
-  private static final String UTF_8 = "UTF-8";
+  private RsaUtil() {}
 
-  public static final String PROVIDER = "BC";
-
-  public static final String KEY_ALGORITHM = "RSA";
-
-  public static final String SIGN_TYPE = "SHA1withRSA";
-
-  public static final String PKCS12 = "PKCS12";
-  public static final String X509 = "X.509";
-
-  /** 貌似默认是RSA/NONE/PKCS1Padding，未验证 */
-  public static final String CIPHER_ALGORITHM = "RSA/ECB/PKCS1Padding";
-
-  /** RSA密钥长度必须是64的倍数，在512~65536之间。默认是1024 */
-  public static final int KEY_SIZE = 1024;
-
-  /** RSA最大加密明文大小 */
+  /** RSA 最大加密明文大小 */
   private static final int MAX_ENCRYPT_BLOCK = 117;
-  /** RSA最大解密密文大小 */
+  /** RSA 最大解密密文大小 */
   private static final int MAX_DECRYPT_BLOCK = 128;
-
-  @Data
-  @AllArgsConstructor
-  public static class Base64KeyPair {
-    private String publicKey;
-    private String privateKey;
-  }
-
-  /**
-   * 生成密钥对。注意这里是生成密钥对KeyPair，再由密钥对获取公私钥
-   *
-   * @return
-   */
-  public static Base64KeyPair generateKeyPair() {
-
-    try {
-      KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
-      keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
-      KeyPair keyPair = keyPairGenerator.generateKeyPair();
-
-      RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-      RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-
-      return new Base64KeyPair(
-          Base64.getEncoder().encodeToString(publicKey.getEncoded()),
-          Base64.getEncoder().encodeToString(privateKey.getEncoded()));
-    } catch (NoSuchAlgorithmException e) {
-      throw new UtilException(e);
-    }
-  }
-
-  public static Key restorePublicKey(String publicKeyStr) {
-    PublicKey publicKey = null;
-    try {
-      byte[] keyBytes = Base64.getDecoder().decode(publicKeyStr);
-      X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-      KeyFactory factory = KeyFactory.getInstance(KEY_ALGORITHM);
-      publicKey = factory.generatePublic(keySpec);
-    } catch (NoSuchAlgorithmException e) {
-      log.error("restore the public key fail!", e);
-    } catch (InvalidKeySpecException e) {
-      log.error("restore the public key fail!", e);
-    }
-    return publicKey;
-  }
-
-  public static Key restorePrivateKey(String privateKeyStr) {
-
-    try {
-      byte[] keyBytes = Base64.getDecoder().decode(privateKeyStr);
-      PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
-      KeyFactory factory = KeyFactory.getInstance(KEY_ALGORITHM);
-      return factory.generatePrivate(pkcs8EncodedKeySpec);
-    } catch (NoSuchAlgorithmException e) {
-      log.error("restore the private key fail!", e);
-    } catch (InvalidKeySpecException e) {
-      log.error("restore the private key fail!", e);
-    }
-    return null;
-  }
-
-  public static PublicKey getPublicKeyFromFile(String certPath) {
-
-    PublicKey publicKey = null;
-    try (InputStream certin = new FileInputStream(certPath)) {
-      CertificateFactory certificateFactory = CertificateFactory.getInstance(X509, PROVIDER);
-      ;
-      Certificate certificate = certificateFactory.generateCertificate(certin);
-      publicKey = certificate.getPublicKey();
-    } catch (CertificateException | NoSuchProviderException | IOException e) {
-      log.error("Get public key failed.", e);
-    }
-
-    return publicKey;
-  }
-
-  public static PrivateKey getPrivateKeyFromFile(String storePath, String keyPass) {
-
-    PrivateKey privateKey = null;
-    try (InputStream in = new FileInputStream(storePath)) {
-      KeyStore keyStore = KeyStore.getInstance(PKCS12, PROVIDER);
-      ;
-      keyStore.load(in, keyPass.toCharArray());
-
-      Enumeration<String> enums = keyStore.aliases();
-      while (enums.hasMoreElements()) {
-        String keyAlias = enums.nextElement();
-        if (keyStore.isKeyEntry(keyAlias)) {
-          privateKey = (PrivateKey) keyStore.getKey(keyAlias, keyPass.toCharArray());
-        }
-      }
-
-    } catch (KeyStoreException e) {
-      log.error("Get public key failed.", e);
-    } catch (NoSuchProviderException e) {
-      log.error("Get public key failed.", e);
-    } catch (NoSuchAlgorithmException e) {
-      log.error("Get public key failed.", e);
-    } catch (CertificateException e) {
-      log.error("Get public key failed.", e);
-    } catch (IOException e) {
-      log.error("Get public key failed.", e);
-    } catch (UnrecoverableKeyException e) {
-      log.error("Get public key failed.", e);
-    }
-
-    return privateKey;
-  }
 
   /**
    * 私钥加密方法
    *
    * @param source 源数据
-   * @return
-   * @throws Exception
+   * @return 加密后
    */
   public static String encryptByPrivateKey(String privateKeyText, String source) {
-    Key privateKey = restorePrivateKey(privateKeyText);
-    return encrypt(privateKey, source);
+    Key privateKey = RsaKeyUtil.restorePrivateKey(privateKeyText);
+    return encrypt(CipherAlgorithm.RSA_ECB_PKCS1, privateKey, source);
   }
 
   public static String decryptByPublicKey(String publicKeyText, String cryptoSrc) {
-    Key publicKey = restorePublicKey(publicKeyText);
+    Key publicKey = RsaKeyUtil.restorePublicKey(publicKeyText);
     return decrypt(publicKey, cryptoSrc);
   }
 
@@ -179,147 +48,234 @@ public class RsaUtil {
    * 公钥加密方法 分段加密
    *
    * @param source 源数据
-   * @return
-   * @throws Exception
+   * @return 加密后
    */
   public static String encrypt(String publicKeyText, String source) {
-    Key publicKey = restorePublicKey(publicKeyText);
-    return encrypt(publicKey, source);
+    Key publicKey = RsaKeyUtil.restorePublicKey(publicKeyText);
+    return encrypt(CipherAlgorithm.RSA_ECB_PKCS1, publicKey, source);
   }
 
   /**
    * 私钥解密算法 分段加密
    *
    * @param cryptoSrc 密文
-   * @return
-   * @throws Exception
+   * @return 结果
    */
   public static String decrypt(String privateKeyText, String cryptoSrc) {
-    Key privatekey = restorePrivateKey(privateKeyText);
-    return decrypt(privatekey, cryptoSrc);
+    Key privateKey = RsaKeyUtil.restorePrivateKey(privateKeyText);
+    return decrypt(privateKey, cryptoSrc);
+  }
+
+  public static String decrypt(Key privateKey, String cryptoSrc) {
+    return decrypt(CipherAlgorithm.RSA_ECB_PKCS1, privateKey, cryptoSrc);
   }
 
   /**
    * 公钥加密方法 分段加密
    *
+   * @param publicKey 公钥
    * @param source 源数据
-   * @return
-   * @throws Exception
+   * @return 结果
    */
-  public static String encrypt(Key publicKey, String source) {
+  public static String encrypt(CipherAlgorithm algorithm, Key publicKey, String source) {
+    return encrypt(null, algorithm, publicKey, source);
+  }
+
+  public static String encrypt(
+      String provider, CipherAlgorithm algorithm, Key publicKey, String source) {
+    return Base64.encodeToString(
+        encryptBytes(provider, algorithm, publicKey, source.getBytes(Constant.CHARSET_UTF_8)));
+  }
+
+  public static byte[] encryptBytes(CipherAlgorithm algorithm, Key publicKey, String source) {
+    return encryptBytes(null, algorithm, publicKey, source.getBytes(Constant.CHARSET_UTF_8));
+  }
+
+  public static byte[] encryptBytes(
+      String provider, CipherAlgorithm algorithm, Key publicKey, byte[] source) {
+    Cipher cipher = CryptoUtil.getCipher(provider, algorithm, Cipher.ENCRYPT_MODE, publicKey);
+    return encryptBytes(cipher, source);
+  }
+
+  public static byte[] encryptBytes(Cipher cipher, byte[] source) {
     try {
-      Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM, PROVIDER);
-      cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-      byte[] data = source.getBytes(UTF_8);
-
-      /** 执行分组加密操作 */
-      byte[] encryptedData = segment(cipher, data, MAX_ENCRYPT_BLOCK);
-      return Base64.getEncoder().encodeToString(encryptedData);
-    } catch (Exception e) {
-      log.error("encrypt fail!", e);
+      return segment(cipher, source, MAX_ENCRYPT_BLOCK);
+    } catch (IllegalBlockSizeException | IOException | BadPaddingException e) {
+      throw new UtilException(e);
     }
-
-    return "";
   }
 
   /**
    * 私钥解密算法 分段加密
    *
    * @param cryptoSrc 密文
-   * @return
-   * @throws Exception
+   * @return 结果
    */
-  public static String decrypt(Key privateKey, String cryptoSrc) {
+  public static String decrypt(CipherAlgorithm algorithm, Key privateKey, String cryptoSrc) {
+    return decrypt(null, algorithm, privateKey, Base64.decode(cryptoSrc));
+  }
 
-    byte[] decryptedData = null;
-    String result = null;
+  public static String decrypt(
+      String provider, CipherAlgorithm algorithm, Key key, byte[] cryptoSrc) {
+    return new String(
+        decryptBytes(
+            CryptoUtil.getCipher(provider, algorithm, Cipher.DECRYPT_MODE, key), cryptoSrc),
+        Constant.CHARSET_UTF_8);
+  }
+
+  public static byte[] decryptBytes(Cipher cipher, byte[] cryptoSrc) {
     try {
-      Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM, PROVIDER);
-      cipher.init(Cipher.DECRYPT_MODE, privateKey);
-
-      byte[] encryptedData = Base64.getDecoder().decode(cryptoSrc);
-      decryptedData = segment(cipher, encryptedData, MAX_DECRYPT_BLOCK);
-      result = new String(decryptedData, UTF_8);
-
-    } catch (Exception e) {
-      log.error("decrypt fail!", e);
+      return segment(cipher, cryptoSrc, MAX_DECRYPT_BLOCK);
+    } catch (IllegalBlockSizeException | IOException | BadPaddingException e) {
+      throw new UtilException(e);
     }
+  }
 
-    return result;
+  public static String sign(SignatureAlgorithm algorithm, PrivateKey privateKey, String content) {
+    return sign(null, algorithm, privateKey, content);
+  }
+
+  public static String sign(
+      String provider, SignatureAlgorithm algorithm, PrivateKey privateKey, String content) {
+    return sign(initSignSignature(provider, algorithm, privateKey), content);
+  }
+
+  public static String sign(Signature signature, String content) {
+    return Base64.encodeToString(signBytes(signature, content));
+  }
+
+  public static byte[] signBytes(
+      String provider, SignatureAlgorithm algorithm, PrivateKey privateKey, String content) {
+    Signature signature = initSignSignature(provider, algorithm, privateKey);
+    return signBytes(signature, content);
+  }
+
+  public static byte[] signBytes(Signature signature, String content) {
+    try {
+      signature.update(content.getBytes(Constant.CHARSET_UTF_8));
+      return signature.sign();
+    } catch (SignatureException e) {
+      throw new UtilException(e);
+    }
+  }
+
+  public static boolean verify(
+      SignatureAlgorithm algorithm, PublicKey publicKey, String signInBase64, String content) {
+    return verify(null, algorithm, publicKey, Base64.decode(signInBase64), content);
+  }
+
+  public static boolean verify(
+      String provider,
+      SignatureAlgorithm algorithm,
+      PublicKey publicKey,
+      byte[] sign,
+      String content) {
+    Signature signature = initVerifySignature(provider, algorithm, publicKey);
+    return verify(signature, sign, content);
+  }
+
+  public static boolean verify(Signature signature, byte[] sign, String content) {
+    try {
+      signature.update(content.getBytes(Constant.CHARSET_UTF_8));
+      return signature.verify(sign);
+    } catch (SignatureException e) {
+      throw new UtilException(e);
+    }
+  }
+
+  public static byte[] signPss(
+      PrivateKey privateKey, AlgorithmParameterSpec param, byte[] content) {
+    Signature signature = null;
+    String sigAlgName = "RSASSA-PSS";
+    try {
+      signature = Signature.getInstance(sigAlgName);
+      signature.setParameter(param);
+      signature.initSign(privateKey);
+      signature.update(content);
+      return signature.sign();
+    } catch (NoSuchAlgorithmException
+        | InvalidAlgorithmParameterException
+        | SignatureException
+        | InvalidKeyException e) {
+      throw new UtilException(e);
+    }
+  }
+
+  public static boolean verifyPss(
+      PublicKey publicKey, AlgorithmParameterSpec param, byte[] sign, byte[] content) {
+    Signature signature = null;
+    String sigAlgName = "RSASSA-PSS";
+    try {
+      signature = Signature.getInstance(sigAlgName);
+      signature.setParameter(param);
+      signature.initVerify(publicKey);
+      signature.update(content);
+      return signature.verify(sign);
+    } catch (NoSuchAlgorithmException
+        | InvalidAlgorithmParameterException
+        | SignatureException
+        | InvalidKeyException e) {
+      throw new UtilException(e);
+    }
+  }
+
+  private static Signature initSignSignature(
+      String provider, SignatureAlgorithm algorithm, PrivateKey privateKey) {
+    Signature signature;
+    try {
+      if (Strings.isNullOrEmpty(provider)) {
+        signature = Signature.getInstance(algorithm.getValue());
+      } else {
+        signature = Signature.getInstance(algorithm.getValue(), provider);
+      }
+      signature.initSign(privateKey);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
+      throw new UtilException(e);
+    }
+    return signature;
+  }
+
+  private static Signature initVerifySignature(
+      String provider, SignatureAlgorithm algorithm, PublicKey publicKey) {
+    Signature signature;
+    try {
+      if (Strings.isNullOrEmpty(provider)) {
+        signature = Signature.getInstance(algorithm.getValue());
+      } else {
+        signature = Signature.getInstance(algorithm.getValue(), provider);
+      }
+      signature.initVerify(publicKey);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
+      throw new UtilException(e);
+    }
+    return signature;
   }
 
   private static byte[] segment(Cipher cipher, byte[] bytes, int maxBlock)
       throws IOException, IllegalBlockSizeException, BadPaddingException {
 
     byte[] decryptedData;
-    /** 执行解密操作 */
+    // 执行解密操作
     int inputLen = bytes.length;
 
     int offSet = 0;
     byte[] cache;
     int i = 0;
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      // 对数据分段加密/解密
-      while (inputLen - offSet > 0) {
-        if (inputLen - offSet > maxBlock) {
-          cache = cipher.doFinal(bytes, offSet, maxBlock);
-        } else {
-          cache = cipher.doFinal(bytes, offSet, inputLen - offSet);
-        }
-        out.write(cache, 0, cache.length);
-        i++;
-        offSet = i * maxBlock;
+    ByteArrayOutputStream out = new ByteArrayOutputStream(inputLen);
+    // 对数据分段加密/解密
+    while (inputLen - offSet > 0) {
+      if (inputLen - offSet > maxBlock) {
+        cache = cipher.doFinal(bytes, offSet, maxBlock);
+      } else {
+        cache = cipher.doFinal(bytes, offSet, inputLen - offSet);
       }
-      decryptedData = out.toByteArray();
+      out.write(cache, 0, cache.length);
+      i++;
+      offSet = i * maxBlock;
     }
+    decryptedData = out.toByteArray();
 
+    out.close();
     return decryptedData;
-  }
-
-  public static String sign(PrivateKey privateKey, String content) {
-    Signature signature;
-    byte[] signByte = null;
-
-    try {
-      signature = Signature.getInstance(SIGN_TYPE);
-      signature.initSign(privateKey);
-      signature.update(content.getBytes(UTF_8));
-      signByte = signature.sign();
-    } catch (NoSuchAlgorithmException e) {
-
-      log.error("sign failed.", e);
-    } catch (InvalidKeyException e) {
-
-      log.error("sign failed.", e);
-    } catch (SignatureException e) {
-
-      log.error("sign failed.", e);
-    } catch (UnsupportedEncodingException e) {
-
-      log.error("sign failed.", e);
-    }
-
-    return Base64.getEncoder().encodeToString(signByte);
-  }
-
-  public static boolean verify(PublicKey publicKey, String sign, String content) {
-    Signature signature;
-    boolean verified = false;
-    try {
-      signature = Signature.getInstance(SIGN_TYPE);
-      signature.initVerify(publicKey);
-      signature.update(content.getBytes(UTF_8));
-      verified = signature.verify(Base64.getDecoder().decode(sign));
-    } catch (NoSuchAlgorithmException e) {
-      log.error("verify failed.", e);
-    } catch (InvalidKeyException e) {
-      log.error("verify failed.", e);
-    } catch (SignatureException e) {
-      log.error("verify failed.", e);
-    } catch (UnsupportedEncodingException e) {
-      log.error("verify failed.", e);
-    }
-
-    return verified;
   }
 }

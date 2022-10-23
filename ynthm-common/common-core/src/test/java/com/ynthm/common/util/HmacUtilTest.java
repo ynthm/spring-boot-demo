@@ -1,7 +1,8 @@
 package com.ynthm.common.util;
 
 import com.google.common.base.MoreObjects;
-import com.ynthm.common.enums.HmacAlgorithm;
+import com.ynthm.common.enums.security.HmacAlgorithm;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -14,17 +15,17 @@ class HmacUtilTest {
 
   @Test
   void testGuava() {
-    System.out.println(
+    Assertions.assertNotNull(
         MoreObjects.toStringHelper("error")
             .add("url", "https://www.ynthm.com")
-            .add("message", "404")
-            .toString());
+            .add("message", "404"));
   }
 
   @Test
   void getHmacKey() {
 
     System.out.println(HmacUtil.hexHmacKey(HmacAlgorithm.HMAC_MD5));
+    Assertions.assertNotNull(HmacUtil.hexHmacKey(HmacAlgorithm.HMAC_MD5));
     System.out.println(
         new String(HmacUtil.hmacKey(HmacAlgorithm.HMAC_MD5), StandardCharsets.UTF_8));
     System.out.println(

@@ -15,6 +15,8 @@ import java.util.Enumeration;
  */
 public class IpAddressUtil {
 
+  private IpAddressUtil() {}
+
   public static String long2Ipv4(long longIp) {
     final StringBuilder sb = new StringBuilder();
     // 直接右移24位
@@ -140,14 +142,9 @@ public class IpAddressUtil {
    */
   private static boolean isReservedAddr(InetAddress inetAddr) {
 
-    if (inetAddr.isAnyLocalAddress()
+    return inetAddr.isAnyLocalAddress()
         || inetAddr.isLinkLocalAddress()
-        || inetAddr.isLoopbackAddress()) {
-
-      return true;
-    }
-
-    return false;
+        || inetAddr.isLoopbackAddress();
   }
 
   public static String canonize(String ipv6Address) throws IllegalArgumentException {

@@ -18,6 +18,7 @@ import java.math.BigDecimal;
  * @author Ethan Wang
  */
 public class NumberUtil {
+  private NumberUtil() {}
 
   /**
    * 比较两个值的大小

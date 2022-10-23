@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn clean deploy -Dmaven.test.skip=true
+mvn clean deploy -e -U -Dmaven.test.skip=true

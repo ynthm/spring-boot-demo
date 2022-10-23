@@ -1,13 +1,12 @@
 package com.ynthm.common.util;
 
+import com.ynthm.common.enums.security.CipherAlgorithm;
+import com.ynthm.common.enums.security.KeyBitLength;
 import com.ynthm.common.exception.UtilException;
 
 import javax.crypto.*;
-import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Objects;
@@ -22,34 +21,12 @@ import java.util.Objects;
  */
 public class AesUtil {
 
-  public static final String KEY_ALGORITHM_AES = "AES";
+  public static final String ALGORITHM_AES = "AES";
 
-  public static final String CIPHER_OPERATION_MODE_ECB = "AES/ECB/PKCS5Padding";
-  public static final String CIPHER_OPERATION_MODE_CBC = "AES/CBC/PKCS5Padding";
-  public static final String CIPHER_OPERATION_MODE_GCM = "AES/GCM/NoPadding";
-
+  /** SecureRandom.getInstance("SHA1PRNG", "SUN") */
   private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-  private AesUtil() {
-    //    SECURE_RANDOM = SecureRandom.getInstance("SHA1PRNG", "SUN");
-  }
-
-  public enum KeyBitLength {
-    /** 基本长度 */
-    SIXTEEN(128),
-    TWENTY_FIVE(192),
-    THIRTY_TWO(256);
-
-    KeyBitLength(int length) {
-      this.length = length;
-    }
-
-    private final int length;
-
-    public int getLength() {
-      return length;
-    }
-  }
+  private AesUtil() {}
 
   /**
    * 密码生成 AES要求密钥的长度可以是128位16个字节、192位(25字节)或者256位(32字节), 位数越高, 加密强度自然越大, 但是加密的效率自然会低一 些, 因此要做好衡量
@@ -61,7 +38,7 @@ public class AesUtil {
   public static byte[] generateAesKey(final String salt, KeyBitLength keyBitLength) {
     Objects.requireNonNull(salt);
     try {
-      KeyGenerator kg = KeyGenerator.getInstance(KEY_ALGORITHM_AES);
+      KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM_AES);
       SECURE_RANDOM.setSeed(salt.getBytes());
       kg.init(keyBitLength.getLength(), SECURE_RANDOM);
       // 产生原始对称密钥
@@ -73,6 +50,10 @@ public class AesUtil {
     }
   }
 
+  public static byte[] encryptEcb(CipherAlgorithm transformation, byte[] key, byte[] data) {
+    return encryptEcb(null, transformation, key, data);
+  }
+
   /**
    * 加密
    *
@@ -80,22 +61,24 @@ public class AesUtil {
    * @param key 加密用密钥 base64 byte[]
    * @return 加密结果 base64
    */
-  public static byte[] encryptECB(byte[] data, byte[] key) {
-    byte[] result;
+  public static byte[] encryptEcb(
+      String provider, CipherAlgorithm transformation, byte[] key, byte[] data) {
     try {
-      Cipher cipher = Cipher.getInstance(CIPHER_OPERATION_MODE_ECB);
-      cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, KEY_ALGORITHM_AES));
-      result = cipher.doFinal(data);
-    } catch (NoSuchPaddingException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | BadPaddingException
-        | IllegalBlockSizeException e) {
+      Cipher cipher =
+          CryptoUtil.getCipher(provider, transformation, Cipher.ENCRYPT_MODE, secretKeySpec(key));
+      return cipher.doFinal(data);
+    } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new UtilException(e);
     }
-    return result;
   }
 
+  public static SecretKeySpec secretKeySpec(byte[] key) {
+    return new SecretKeySpec(key, ALGORITHM_AES);
+  }
+
+  public static byte[] decryptEcb(CipherAlgorithm transformation, byte[] key, byte[] data) {
+    return decryptEcb(null, transformation, key, data);
+  }
   /**
    * 解密 ECB 模式
    *
@@ -103,20 +86,15 @@ public class AesUtil {
    * @param key key.getBytes(UTF_8)
    * @return 解密 new String(x, UTF_8) 根据需要 Base64.getEncoder().encodeToString(x)
    */
-  public static byte[] decryptECB(byte[] data, byte[] key) {
-    byte[] result;
+  public static byte[] decryptEcb(
+      String provider, CipherAlgorithm transformation, byte[] key, byte[] data) {
     try {
-      Cipher cipher = Cipher.getInstance(CIPHER_OPERATION_MODE_ECB);
-      cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"));
-      result = cipher.doFinal(data);
-    } catch (NoSuchPaddingException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | BadPaddingException
-        | IllegalBlockSizeException e) {
+      Cipher cipher =
+          CryptoUtil.getCipher(provider, transformation, Cipher.DECRYPT_MODE, secretKeySpec(key));
+      return cipher.doFinal(data);
+    } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new UtilException(e);
     }
-    return result;
   }
 
   /**
@@ -126,33 +104,42 @@ public class AesUtil {
    */
   public static byte[] iv() {
     byte[] bytes = new byte[16];
-    SECURE_RANDOM.nextBytes(bytes);
+    SecureRandom secureRandom = new SecureRandom();
+    secureRandom.nextBytes(bytes);
     return bytes;
   }
 
+  public static byte[] encryptCbc(
+      CipherAlgorithm transformation, byte[] key, byte[] iv, byte[] data) {
+    return encryptCbc(null, transformation, key, iv, data);
+  }
   /**
    * 解密时用到的密钥, 初始向量IV, 加密模式, Padding模式必须和加密时的保持一致, 否则则会解密失败.
    *
-   * @param data data.getBytes(UTF_8) 如果编码 Base64.getDecoder().decode(data)
+   * @param data data.getBytes(UTF_8) 如果编码 Base64.getDecoder().decode(data) 大于16 bytes
    * @param key key.getBytes(UTF_8)
    * @return 解密 new String(x, UTF_8) 根据需要 Base64.getEncoder().encodeToString(x)
    */
-  public static byte[] encryptCBC(byte[] data, byte[] key, byte[] iv) {
-    byte[] result;
+  public static byte[] encryptCbc(
+      String provider, CipherAlgorithm transformation, byte[] key, byte[] iv, byte[] data) {
     try {
-      IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      Cipher cipher = Cipher.getInstance(CIPHER_OPERATION_MODE_CBC);
-      cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
-      result = cipher.doFinal(data);
-    } catch (NoSuchPaddingException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | BadPaddingException
-        | IllegalBlockSizeException
-        | InvalidAlgorithmParameterException e) {
+
+      Cipher cipher =
+          CryptoUtil.getCipher(
+              provider,
+              transformation,
+              Cipher.ENCRYPT_MODE,
+              secretKeySpec(key),
+              new IvParameterSpec(iv));
+      return cipher.doFinal(data);
+    } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new UtilException(e);
     }
-    return result;
+  }
+
+  public static byte[] decryptCbc(
+      CipherAlgorithm transformation, byte[] key, byte[] iv, byte[] data) {
+    return decryptCbc(null, transformation, key, iv, data);
   }
 
   /**
@@ -160,25 +147,23 @@ public class AesUtil {
    * @param key key.getBytes(UTF_8)
    * @return 解密 new String(x, UTF_8) 根据需要 Base64.getEncoder().encodeToString(x)
    */
-  public static byte[] decryptCBC(byte[] data, byte[] key, byte[] iv) {
-    byte[] result;
+  public static byte[] decryptCbc(
+      String provider, CipherAlgorithm transformation, byte[] key, byte[] iv, byte[] data) {
 
     try {
       //  CBC 模式需要用到初始向量参数
-      IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      Cipher cipher = Cipher.getInstance(CIPHER_OPERATION_MODE_CBC);
-      cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
-      result = cipher.doFinal(data);
-    } catch (NoSuchPaddingException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | BadPaddingException
-        | IllegalBlockSizeException
-        | InvalidAlgorithmParameterException e) {
+      Cipher cipher =
+          CryptoUtil.getAesDecryptCbc(provider, transformation, Cipher.DECRYPT_MODE, key, iv);
+
+      return cipher.doFinal(data);
+    } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new UtilException(e);
     }
+  }
 
-    return result;
+  public static byte[] encryptGcm(
+      CipherAlgorithm transformation, byte[] key, byte[] iv, byte[] aad, byte[] data) {
+    return encryptGcm(null, transformation, key, iv, aad, data);
   }
 
   /**
@@ -186,23 +171,28 @@ public class AesUtil {
    * @param key key.getBytes(UTF_8)
    * @return 结果 new String(x, UTF_8) 根据需要 Base64.getEncoder().encodeToString(x)
    */
-  public static byte[] encryptGCM(byte[] data, byte[] key, byte[] iv, byte[] aad) {
+  public static byte[] encryptGcm(
+      String provider,
+      CipherAlgorithm transformation,
+      byte[] key,
+      byte[] iv,
+      byte[] aad,
+      byte[] data) {
     byte[] result;
     try {
-      Cipher cipher = Cipher.getInstance(CIPHER_OPERATION_MODE_GCM);
-      cipher.init(
-          Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+      Cipher cipher =
+          CryptoUtil.getAesDecryptGcm(provider, transformation, Cipher.ENCRYPT_MODE, key, iv);
       cipher.updateAAD(aad);
       result = cipher.doFinal(data);
-    } catch (NoSuchPaddingException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | BadPaddingException
-        | IllegalBlockSizeException
-        | InvalidAlgorithmParameterException e) {
+    } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new UtilException(e);
     }
     return result;
+  }
+
+  public static byte[] decryptGcm(
+      CipherAlgorithm transformation, byte[] key, byte[] iv, byte[] aad, byte[] data) {
+    return decryptGcm(null, transformation, key, iv, aad, data);
   }
 
   /**
@@ -210,22 +200,20 @@ public class AesUtil {
    * @param key key.getBytes(UTF_8)
    * @return 解密 new String(x, UTF_8) 根据需要 Base64.getEncoder().encodeToString(x)
    */
-  public static byte[] decryptGCM(byte[] data, byte[] key, byte[] iv, byte[] aad) {
-    byte[] result;
+  public static byte[] decryptGcm(
+      String provider,
+      CipherAlgorithm transformation,
+      byte[] key,
+      byte[] iv,
+      byte[] aad,
+      byte[] data) {
     try {
-      Cipher cipher = Cipher.getInstance(CIPHER_OPERATION_MODE_GCM);
-      cipher.init(
-          Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+      Cipher cipher =
+          CryptoUtil.getAesDecryptGcm(provider, transformation, Cipher.DECRYPT_MODE, key, iv);
       cipher.updateAAD(aad);
-      result = cipher.doFinal(data);
-    } catch (NoSuchPaddingException
-        | NoSuchAlgorithmException
-        | InvalidKeyException
-        | BadPaddingException
-        | IllegalBlockSizeException
-        | InvalidAlgorithmParameterException e) {
+      return cipher.doFinal(data);
+    } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new UtilException(e);
     }
-    return result;
   }
 }

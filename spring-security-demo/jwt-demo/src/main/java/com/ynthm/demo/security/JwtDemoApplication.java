@@ -5,6 +5,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.TimeZone;
 
@@ -12,6 +13,7 @@ import java.util.TimeZone;
  * @author ethan
  */
 @Slf4j
+@EnableJdbcRepositories
 @SpringBootApplication
 public class JwtDemoApplication implements ApplicationRunner {
 

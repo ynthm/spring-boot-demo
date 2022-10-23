@@ -1,5 +1,6 @@
 server:
   port: 8801
+  shutdown: graceful
 
 spring:
   application:
@@ -14,6 +15,9 @@ spring:
           name: web-demo
 #  jackson:
 #    time-zone: GMT+8
+local.ssl:
+  trust-store: classpath:ynthm-truststore.jks
+  trust-store-password: changeit
 
 management:
   endpoints:
