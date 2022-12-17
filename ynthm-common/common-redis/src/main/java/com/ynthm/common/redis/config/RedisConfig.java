@@ -1,5 +1,9 @@
 package com.ynthm.common.redis.config;
 
+import com.ynthm.common.redis.util.RedisUtil;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -9,8 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.scripting.support.ResourceScriptSource;
 
 import java.io.File;
@@ -19,6 +22,8 @@ import java.io.File;
  * @author Ethan Wang
  */
 @Configuration
+@EnableCaching
+@AutoConfigureBefore(RedisAutoConfiguration.class)
 public class RedisConfig {
 
   /**
@@ -31,13 +36,20 @@ public class RedisConfig {
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
     template.setConnectionFactory(connectionFactory);
-    template.setKeySerializer(new StringRedisSerializer());
-    // 默认的 JdkSerializationRedisSerializer increment 会报错
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
-    template.setHashKeySerializer(new StringRedisSerializer());
-    template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+    template.setKeySerializer(RedisSerializer.string());
+    template.setValueSerializer(RedisSerializer.json());
+
+    template.setHashKeySerializer(RedisSerializer.string());
+    template.setHashValueSerializer(RedisSerializer.json());
+    // 使上面参数生效
+    template.afterPropertiesSet();
     return template;
+  }
+
+  @Bean
+  public RedisUtil redisUtil(RedisTemplate<String, Object> redisTemplate) {
+    return new RedisUtil(redisTemplate);
   }
 
   @Bean

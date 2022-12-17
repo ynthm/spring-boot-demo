@@ -5,13 +5,11 @@ import com.ynthm.common.constant.CharPool;
 import com.ynthm.common.constant.Constant;
 import com.ynthm.common.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
+import org.springframework.http.*;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +19,11 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * @author Ethan Wang
@@ -68,6 +70,17 @@ public class ServletUtil {
     } catch (Exception e) {
       throw new BaseException(e);
     }
+  }
+
+  public static String contentDispositionAttachment(String fileName) {
+    return ContentDisposition.attachment()
+        .filename(fileName, StandardCharsets.UTF_8)
+        .build()
+        .toString();
+  }
+
+  public static String mimeType(HttpServletRequest request, MultipartFile file) {
+    return request.getServletContext().getMimeType(file.getOriginalFilename());
   }
 
   public static void renderString(HttpServletResponse response, String json) throws IOException {
@@ -187,5 +200,28 @@ public class ServletUtil {
       url = request.getRequestURL().toString();
     }
     return url;
+  }
+
+  /**
+   * POST application/x-www-form-urlencoded
+   *
+   * @param request HttpServletRequest
+   * @return 结果
+   */
+  public static SortedMap<String, String> getFormParameterMap(HttpServletRequest request) {
+    TreeMap<String, String> transMap = new TreeMap<>();
+    Enumeration<String> enu = request.getParameterNames();
+    String t;
+    while (enu.hasMoreElements()) {
+      t = enu.nextElement();
+      transMap.put(t, request.getParameter(t));
+    }
+    return transMap;
+  }
+
+  public static String getQueryString(SortedMap<String, String> treeMap) {
+    return treeMap.entrySet().stream()
+        .map(entry -> entry.getKey() + "=" + entry.getValue())
+        .collect(Collectors.joining("&"));
   }
 }

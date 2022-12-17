@@ -313,7 +313,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     log.error(e.getLocalizedMessage(), e);
     HttpStatus status = HttpStatus.BAD_REQUEST;
     return Result.of(
-        wrapperBindingResult(e.getBindingResult()), status.value(), status.getReasonPhrase());
+        wrapperBindingResult(e.getBindingResult()), status.value(), status.getReasonPhrase(), null);
   }
 
   /**
@@ -364,11 +364,11 @@ public class GlobalExceptionHandler extends BasicErrorController {
    * @return 异常结果
    */
   @ExceptionHandler(value = Exception.class)
-  public Result<String> handleException(Exception e) {
+  public Result<Void> handleException(Exception e) {
     if (e instanceof JacksonException) {
       return Result.error(BaseResultCode.ERROR, ((JacksonException) e).getOriginalMessage());
     } else if (e instanceof ValidationException) {
-      return Result.of(null, HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage());
+      return Result.of(null, HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage(), null);
     }
     log.error(ExceptionUtil.printStackTrace(e));
     return Result.error(BaseResultCode.ERROR, getMessage(e));

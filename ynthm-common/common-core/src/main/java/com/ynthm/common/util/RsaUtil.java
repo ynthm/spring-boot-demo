@@ -185,7 +185,7 @@ public class RsaUtil {
 
   public static byte[] signPss(
       PrivateKey privateKey, AlgorithmParameterSpec param, byte[] content) {
-    Signature signature = null;
+    Signature signature;
     String sigAlgName = "RSASSA-PSS";
     try {
       signature = Signature.getInstance(sigAlgName);
@@ -203,7 +203,7 @@ public class RsaUtil {
 
   public static boolean verifyPss(
       PublicKey publicKey, AlgorithmParameterSpec param, byte[] sign, byte[] content) {
-    Signature signature = null;
+    Signature signature;
     String sigAlgName = "RSASSA-PSS";
     try {
       signature = Signature.getInstance(sigAlgName);

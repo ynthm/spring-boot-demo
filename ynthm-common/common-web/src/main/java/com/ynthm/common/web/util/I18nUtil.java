@@ -2,7 +2,6 @@ package com.ynthm.common.web.util;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Locale;
@@ -10,7 +9,6 @@ import java.util.Locale;
 /**
  * @author ethan
  */
-@Component
 public class I18nUtil {
 
   @Resource private MessageSource messageSource;

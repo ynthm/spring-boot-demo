@@ -4,10 +4,12 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
+import java.time.format.SignStyle;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static java.time.temporal.ChronoField.*;
 
@@ -20,8 +22,29 @@ public class TimeUtil {
   public static final ZoneId GMT8 = ZoneId.of("Asia/Shanghai");
   public static final ZoneId UTC = ZoneId.of("UTC");
 
-  public static final DateTimeFormatter FORMATTER_1 =
+  public static final DateTimeFormatter DTF_LDT =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+  /**
+   * 匹配 4位年份 1~2位月份 1~2位天
+   *
+   * <p>等价 DateTimeFormatterBuilder.appendValue(YEAR, 4, 10,
+   * SignStyle.EXCEEDS_PAD).appendLiteral('/').appendValue(MONTH_OF_YEAR).appendValue(DAY_OF_MONTH).toFormatter();
+   */
+  public static final DateTimeFormatter DTF_DF_1 = DateTimeFormatter.ofPattern("yyyy/M/d");
+
+  public static final DateTimeFormatter DTF_DF_2;
+
+  static {
+    DTF_DF_2 =
+        new DateTimeFormatterBuilder()
+            .appendValue(YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
+            .appendLiteral('-')
+            .appendValue(MONTH_OF_YEAR, 1, 2, SignStyle.NORMAL)
+            .appendLiteral('-')
+            .appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NORMAL)
+            .toFormatter();
+  }
 
   public static final DateTimeFormatter FORMATTER_ISO_LDT =
       new DateTimeFormatterBuilder()
@@ -52,9 +75,32 @@ public class TimeUtil {
 
   private TimeUtil() {}
 
-  public static LocalDateTime ldtOf(long timestamp, ZoneId at) {
-    Instant instant = Instant.ofEpochMilli(timestamp);
+  public static LocalDateTime ldtOf(Instant instant, ZoneId at) {
     return LocalDateTime.ofInstant(instant, at);
+  }
+
+  /**
+   * {@link Instant}转{@link LocalDateTime}，使用默认时区
+   *
+   * @param instant {@link Instant}
+   * @return {@link LocalDateTime}
+   */
+  public static LocalDateTime ldtOf(Instant instant) {
+    return ldtOf(instant, ZoneId.systemDefault());
+  }
+
+  /**
+   * {@link Instant}转{@link LocalDateTime}，使用UTC时区
+   *
+   * @param instant {@link Instant}
+   * @return {@link LocalDateTime}
+   */
+  public static LocalDateTime ldtOfUtc(Instant instant) {
+    return ldtOf(instant, UTC);
+  }
+
+  public static LocalDateTime ldtOf(long epochMilli, ZoneId at) {
+    return ldtOf(Instant.ofEpochMilli(epochMilli), at);
   }
 
   /**
@@ -63,6 +109,14 @@ public class TimeUtil {
    */
   public static LocalDateTime ldtOfUtc(long timestamp) {
     return ldtOf(timestamp, UTC);
+  }
+
+  public static LocalDateTime ldtOf(long epochMilli) {
+    return ldtOf(epochMilli, ZoneId.systemDefault());
+  }
+
+  public static ZoneId zoneId(TimeZone timeZone) {
+    return timeZone.toZoneId();
   }
 
   public static OffsetDateTime of(long epochMilli, ZoneId on) {
@@ -105,12 +159,6 @@ public class TimeUtil {
     return date.toInstant().atZone(to).toLocalDateTime();
   }
 
-  public static long parse(String text, ZoneId at) {
-    LocalDateTime localDateTime = LocalDateTime.parse(text, FORMATTER_1);
-    ZonedDateTime of = ZonedDateTime.of(localDateTime, at);
-    return of.toInstant().toEpochMilli();
-  }
-
   public static long getTimestamp(LocalDateTime localDateTime, ZoneId at) {
     Instant instant = localDateTime.atZone(at).toInstant();
     return instant.toEpochMilli();
@@ -121,34 +169,23 @@ public class TimeUtil {
   }
 
   public static LocalDateTime parseLocalDateTime(String str) {
-    return LocalDateTime.parse(str, FORMATTER_1);
+    return LocalDateTime.parse(str, DTF_LDT);
   }
 
   public static long toTimestamp(LocalDateTime localDateTime, ZoneOffset at) {
     return localDateTime.toInstant(at).toEpochMilli();
   }
 
-  public static String format(LocalDateTime localDateTime) {
-    return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+  public static Instant instantOf(LocalDateTime localDateTime, ZoneId at) {
+    return localDateTime.atZone(at).toInstant();
+  }
+
+  public static Instant instantOf(long epochMilli) {
+    return Instant.ofEpochMilli(epochMilli);
   }
 
   public LocalDateTime toLocalDateTime(long timestamp, ZoneId at) {
     return Instant.ofEpochMilli(timestamp).atZone(at).toLocalDateTime();
-  }
-
-  /**
-   * 日志、界面展示用
-   *
-   * @param epochMilli 毫秒
-   * @param lo 地区
-   * @param zoneId 时区
-   * @return 结果字符串
-   */
-  public static String timestampToString(long epochMilli, Locale lo, ZoneId zoneId) {
-    Instant ins = Instant.ofEpochMilli(epochMilli);
-    DateTimeFormatter f =
-        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
-    return f.withLocale(lo).format(ZonedDateTime.ofInstant(ins, zoneId));
   }
 
   /** 取本月第一天 */
@@ -170,5 +207,34 @@ public class TimeUtil {
   /** 取本月最后一天的结束时间 */
   public static LocalDateTime endOfThisMonth() {
     return LocalDateTime.of(lastDayOfThisMonth(), LocalTime.MAX);
+  }
+
+  public static String format(LocalDateTime localDateTime) {
+    return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+  }
+
+  /**
+   * 日志、界面展示用
+   *
+   * @param epochMilli 毫秒
+   * @param lo 地区
+   * @param zoneId 时区
+   * @return 结果字符串
+   */
+  public static String timestampToString(long epochMilli, Locale lo, ZoneId zoneId) {
+    Instant ins = Instant.ofEpochMilli(epochMilli);
+    DateTimeFormatter f =
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
+    return f.withLocale(lo).format(ZonedDateTime.ofInstant(ins, zoneId));
+  }
+
+  public static long parse(String text, ZoneId at) {
+    return parseInstant(text, DTF_LDT, at).toEpochMilli();
+  }
+
+  public static Instant parseInstant(String text, DateTimeFormatter formatter, ZoneId at) {
+    LocalDateTime localDateTime = LocalDateTime.parse(text, formatter);
+    ZonedDateTime of = ZonedDateTime.of(localDateTime, at);
+    return of.toInstant();
   }
 }

@@ -1,5 +1,7 @@
 package com.ynthm.common.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -40,5 +42,39 @@ public class RandomUtil {
     }
 
     return new String(result);
+  }
+
+  /**
+   * 获取金额
+   *
+   * @param min 最小
+   * @param max 最大
+   * @return 中间值
+   */
+  public static BigDecimal getFloatingPriceBetweenMinAndMax(BigDecimal min, BigDecimal max) {
+    float minF = min.floatValue();
+    float maxF = max.floatValue();
+
+    // 生成随机数
+    BigDecimal db = BigDecimal.valueOf(Math.random() * (maxF - minF) + minF);
+    int scale = Math.max(min.scale(), max.scale());
+
+    // 返回保留两位小数的随机数。不进行四舍五入
+    return db.setScale(scale, RoundingMode.DOWN);
+  }
+
+  /**
+   * @param basic 基准
+   * @param floatingRange 浮动范围
+   * @return 结果
+   */
+  public static BigDecimal getFloatingPrice(BigDecimal basic, BigDecimal floatingRange) {
+    float minF = basic.floatValue();
+
+    // 生成随机数
+    BigDecimal db = BigDecimal.valueOf(Math.random() * floatingRange.floatValue() + minF);
+
+    // 返回保留两位小数的随机数。不进行四舍五入
+    return db.setScale(basic.scale(), RoundingMode.DOWN);
   }
 }

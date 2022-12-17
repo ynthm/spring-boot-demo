@@ -93,12 +93,12 @@ public class RsaBcUtil {
    */
   public static String encryptByPrivateKey(String privateKeyText, String source) {
     Key privateKey = restorePrivateKey(privateKeyText);
-    return encrypt(CipherAlgorithm.RSA_ECB, privateKey, source);
+    return encrypt(CipherAlgorithm.RSA_ECB_PKCS1, privateKey, source);
   }
 
   public static String decryptByPublicKey(String publicKeyText, String cryptoSrc) {
     Key publicKey = RsaKeyUtil.restorePublicKey(publicKeyText);
-    return decrypt(CipherAlgorithm.RSA_ECB, publicKey, cryptoSrc);
+    return decrypt(CipherAlgorithm.RSA_ECB_PKCS1, publicKey, cryptoSrc);
   }
 
   /**

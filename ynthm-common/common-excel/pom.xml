@@ -39,6 +39,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.apifan.common/common-random -->
+        <dependency>
+            <groupId>com.apifan.common</groupId>
+            <artifactId>common-random</artifactId>
+            <version>1.0.18</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
