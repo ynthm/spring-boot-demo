@@ -31,6 +31,7 @@
         <module>common-jpa</module>
         <module>common-mybatis-plus</module>
         <module>common-validation</module>
+        <module>common-context</module>
     </modules>
 
     <dependencies>

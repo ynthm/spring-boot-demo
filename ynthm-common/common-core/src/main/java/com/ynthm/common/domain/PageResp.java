@@ -14,7 +14,7 @@ import java.util.List;
 @Accessors(chain = true)
 @Data
 @NoArgsConstructor
-public class PageResp<T extends Serializable> implements Serializable {
+public class PageResp<T> implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
