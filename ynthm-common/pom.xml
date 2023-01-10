@@ -25,11 +25,9 @@
     <modules>
         <module>common-core</module>
         <module>common-web</module>
-        <module>common-excel</module>
         <module>common-redis</module>
         <module>common-util</module>
         <module>common-jpa</module>
-        <module>common-mybatis-plus</module>
         <module>common-validation</module>
         <module>common-context</module>
     </modules>

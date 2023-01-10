@@ -71,7 +71,7 @@ public class IpAddressUtil {
     }
   }
 
-  public static String numberToIPv6(BigInteger ipNumber) {
+  public static String numberToIpv6(BigInteger ipNumber) {
     StringBuilder ipString = new StringBuilder();
     BigInteger a = new BigInteger("FFFF", 16);
 
@@ -84,7 +84,7 @@ public class IpAddressUtil {
     return ipString.substring(0, ipString.length() - 1);
   }
 
-  public static String getLocalIPv6Address() {
+  public static String getLocalIpv6Address() {
 
     InetAddress inetAddress = null;
 
@@ -150,7 +150,7 @@ public class IpAddressUtil {
   public static String canonize(String ipv6Address) throws IllegalArgumentException {
     if (ipv6Address == null) {
       return null;
-    } else if (!mayBeIPv6Address(ipv6Address)) {
+    } else if (!mayBeIpv6Address(ipv6Address)) {
       return ipv6Address;
     } else {
       int ipv6AddressLength = ipv6Address.length();
@@ -292,7 +292,7 @@ public class IpAddressUtil {
     }
   }
 
-  public static boolean mayBeIPv6Address(String input) {
+  public static boolean mayBeIpv6Address(String input) {
     if (input == null) {
       return false;
     } else {

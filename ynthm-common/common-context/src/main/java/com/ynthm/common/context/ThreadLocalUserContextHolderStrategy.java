@@ -5,25 +5,28 @@ package com.ynthm.common.context;
  * @version 1.0
  */
 final class ThreadLocalUserContextHolderStrategy implements UserContextHolderStrategy {
-  private static final ThreadLocal<UserContext> contextHolder = new ThreadLocal();
+  private static final ThreadLocal<UserContext> CONTEXT_HOLDER = new ThreadLocal();
 
   public ThreadLocalUserContextHolderStrategy() {}
 
+  @Override
   public void clearContext() {
-    contextHolder.remove();
+    CONTEXT_HOLDER.remove();
   }
 
+  @Override
   public UserContext getContext() {
-    UserContext ctx = contextHolder.get();
+    UserContext ctx = CONTEXT_HOLDER.get();
     if (ctx == null) {
-      contextHolder.set(ctx);
+      CONTEXT_HOLDER.set(ctx);
     }
 
     return ctx;
   }
 
+  @Override
   public void setContext(UserContext context) {
     //    Assert.notNull(context, "Only non-null SecurityContext instances are permitted");
-    contextHolder.set(context);
+    CONTEXT_HOLDER.set(context);
   }
 }

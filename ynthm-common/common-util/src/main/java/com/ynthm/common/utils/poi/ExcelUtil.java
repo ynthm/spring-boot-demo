@@ -1,7 +1,7 @@
 package com.ynthm.common.utils.poi;
 
-import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -77,7 +77,7 @@ public class ExcelUtil {
   private void processSheet(
       StylesTable styles, ReadOnlySharedStringsTable strings, InputStream sheetInputStream)
       throws SAXException, ParserConfigurationException, IOException {
-    XMLReader sheetParser = SAXHelper.newXMLReader();
+    XMLReader sheetParser = XMLHelper.newXMLReader();
 
     if (handler == null) {
       setHandler(new SimpleSheetContentsHandler());

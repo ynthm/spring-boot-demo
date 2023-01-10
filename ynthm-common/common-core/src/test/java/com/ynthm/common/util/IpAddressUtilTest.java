@@ -24,11 +24,11 @@ class IpAddressUtilTest {
 
     System.out.println(IpAddressUtil.canonize("2408:0000:0000:797a:919c"));
 
-    String localIPv6Address = IpAddressUtil.getLocalIPv6Address();
+    String localIPv6Address = IpAddressUtil.getLocalIpv6Address();
 
     BigInteger bigInteger = IpAddressUtil.ipv6ToNumber("2408:8256:3083:8c79:402e:80ba:797a:919c");
     System.out.println(bigInteger.bitLength());
-    String s = IpAddressUtil.numberToIPv6(bigInteger);
+    String s = IpAddressUtil.numberToIpv6(bigInteger);
 
     System.out.println(hostAddress);
   }

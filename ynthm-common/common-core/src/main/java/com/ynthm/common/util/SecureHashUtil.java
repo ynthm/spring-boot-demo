@@ -124,9 +124,9 @@ public class SecureHashUtil {
     return salt;
   }
 
-  public static String hmacSHA256(String data, String key) {
+  public static String hmacSha256(String data, String key) {
     try {
-      return hmacSHA256(data.getBytes(UTF_8), key.getBytes(UTF_8));
+      return hmacSha256(data.getBytes(UTF_8), key.getBytes(UTF_8));
     } catch (UnsupportedEncodingException e) {
       LOGGER.error("UnsupportedEncodingException.", e);
     } catch (NoSuchAlgorithmException e) {
@@ -138,7 +138,7 @@ public class SecureHashUtil {
     return null;
   }
 
-  public static String hmacSHA256(byte[] data, byte[] key)
+  public static String hmacSha256(byte[] data, byte[] key)
       throws NoSuchAlgorithmException, InvalidKeyException {
     SecretKeySpec signingKey = new SecretKeySpec(key, ALGORITHM_HMAC_SHA256);
     Mac mac = Mac.getInstance(ALGORITHM_HMAC_SHA256);

@@ -7,11 +7,8 @@ import java.io.Serializable;
  * @version 1.0
  */
 public interface UserContext extends Serializable {
-  Long getTenantId();
 
-  void setTenantId(Long tenantId);
+  AuthUser getAuthUser();
 
-  String getUsername();
-
-  void setUsername(String username);
+  void setAuthUser(AuthUser authUser);
 }
