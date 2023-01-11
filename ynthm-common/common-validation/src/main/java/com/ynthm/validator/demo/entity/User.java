@@ -1,6 +1,6 @@
 package com.ynthm.validator.demo.entity;
 
-import com.ynthm.validator.demo.common.validator.groups.CreateGroup;
+import com.ynthm.validator.demo.common.validator.groups.InsertGroup;
 import com.ynthm.validator.demo.common.validator.groups.UpdateGroup;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 public class User {
   /** ID 更新的时候非空 */
-  @Null(message = "ID 为空", groups = CreateGroup.class)
+  @Null(message = "ID 为空", groups = InsertGroup.class)
   @NotNull(message = "ID 不能为空", groups = UpdateGroup.class)
   private Long id;
   /** 性别(0,1) */

@@ -3,8 +3,8 @@ package com.ynthm.common.web.config;
 import com.ynthm.common.web.properties.OkHttpProperties;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Ethan Wang
  */
-@Configuration
+@EnableConfigurationProperties({OkHttpProperties.class})
 public class RestTemplateConfig {
 
   private final OkHttpProperties properties;

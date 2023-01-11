@@ -37,12 +37,7 @@ public class I18nUtil {
    * @return message
    */
   public String getMessage(String code, Object[] args, String defaultMessage) {
-    Locale locale = UserUtil.getLocale();
-    if (locale == null) {
-      locale = LocaleContextHolder.getLocale();
-    }
-
-    return messageSource.getMessage(code, args, defaultMessage, locale);
+    return messageSource.getMessage(code, args, defaultMessage, LocaleContextHolder.getLocale());
   }
 
   public String getMessage(String code, Object[] args, Locale locale) {

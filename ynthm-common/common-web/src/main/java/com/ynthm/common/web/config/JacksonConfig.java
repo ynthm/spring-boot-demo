@@ -10,7 +10,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
@@ -18,7 +17,6 @@ import java.io.IOException;
  * @author Ynthm Wang
  * @version 1.0
  */
-@Configuration
 public class JacksonConfig {
 
   /**

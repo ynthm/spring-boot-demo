@@ -1,6 +1,12 @@
 package com.ynthm.common.context;
 
 /**
+ * 用户上下文
+ *
+ * <p>参考 Spring Context LocaleContextHolder
+ *
+ * <p>参考 Spring Security SecurityContextHolder
+ *
  * @author Ethan Wang
  * @version 1.0
  */

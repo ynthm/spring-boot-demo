@@ -5,4 +5,4 @@ import javax.validation.groups.Default;
 /**
  * @author ethan
  */
-public interface CreateGroup extends Default {}
+public interface InsertGroup extends Default {}
