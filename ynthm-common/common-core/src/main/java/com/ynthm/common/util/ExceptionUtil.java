@@ -3,6 +3,8 @@ package com.ynthm.common.util;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Ethan Wang
@@ -25,6 +27,23 @@ public class ExceptionUtil {
       log.error(ex.getMessage());
     }
     return swStr;
+  }
+
+  public static Throwable getRootCause(Throwable throwable) {
+    if (throwable == null) {
+      return null;
+    } else {
+      Throwable rootCause = throwable;
+      Set<Throwable> seenThrowables = new HashSet();
+      seenThrowables.add(throwable);
+
+      while (rootCause.getCause() != null && !seenThrowables.contains(rootCause.getCause())) {
+        seenThrowables.add(rootCause.getCause());
+        rootCause = rootCause.getCause();
+      }
+
+      return rootCause;
+    }
   }
 
   public static String getFullStackTrace(Exception e) {

@@ -237,4 +237,18 @@ public class TimeUtil {
     ZonedDateTime of = ZonedDateTime.of(localDateTime, at);
     return of.toInstant();
   }
+
+  public static PeriodDay periodDay(Duration duration) {
+    long days = duration.toDays();
+    Duration durationMinusDays = duration.minusDays(days);
+    long hours = durationMinusDays.toHours();
+    Duration durationMinusDaysAndHours = durationMinusDays.minusHours(hours);
+    long minutes = durationMinusDaysAndHours.toMinutes();
+
+    return new PeriodDay()
+        .setDays(days)
+        .setHours(hours)
+        .setMinutes(minutes)
+        .setSeconds(durationMinusDaysAndHours.minusMinutes(minutes).toMillis() / 1000);
+  }
 }

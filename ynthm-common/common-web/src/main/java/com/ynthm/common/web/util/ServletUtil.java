@@ -72,15 +72,19 @@ public class ServletUtil {
     }
   }
 
-  public static String contentDispositionAttachment(String fileName) {
+  public static String contentDispositionAttachment(String filename) {
     return ContentDisposition.attachment()
-        .filename(fileName, StandardCharsets.UTF_8)
+        .filename(filename, StandardCharsets.UTF_8)
         .build()
         .toString();
   }
 
   public static String mimeType(HttpServletRequest request, MultipartFile file) {
     return request.getServletContext().getMimeType(file.getOriginalFilename());
+  }
+
+  public static String contentType(String filename) {
+    return MediaTypeFactory.getMediaType(filename).orElse(MediaType.ALL).toString();
   }
 
   public static void renderString(HttpServletResponse response, String json) throws IOException {
@@ -111,21 +115,36 @@ public class ServletUtil {
   }
 
   /**
-   * @param response 响应
-   * @param fileName 带扩展名的文件名
+   * Java url 编码会将空格编码成 + 前端推荐使用 %20
+   *
+   * @param filename
+   * @return
    */
-  public static void responseForDownload(HttpServletResponse response, String fileName) {
-    response.setContentType(
-        MediaTypeFactory.getMediaType(fileName).orElse(MediaType.ALL).toString());
-    response.setCharacterEncoding(Constant.UTF_8);
+  public static String urlEncode(String filename) {
     try {
       // 这里URLEncoder.encode可以防止中文乱码
-      fileName = URLEncoder.encode(fileName, Constant.UTF_8).replace("\\+", "%20");
+      return URLEncoder.encode(filename, Constant.UTF_8).replace("\\+", "%20");
     } catch (UnsupportedEncodingException e) {
       log.error("encoding filename error.", e);
     }
 
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename*=utf-8''" + fileName);
+    return filename;
+  }
+
+  /**
+   * @param response 响应
+   * @param filename 带扩展名的文件名
+   */
+  public static void responseForDownload(HttpServletResponse response, String filename) {
+    responseForDownload(response, contentType(filename), filename);
+  }
+
+  public static void responseForDownload(
+      HttpServletResponse response, String contentType, String filename) {
+    response.setContentType(contentType);
+    response.setCharacterEncoding(Constant.UTF_8);
+
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDispositionAttachment(filename));
   }
 
   public static String getIpAddress(HttpServletRequest request) {

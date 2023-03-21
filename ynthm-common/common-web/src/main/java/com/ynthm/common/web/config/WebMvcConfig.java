@@ -1,6 +1,8 @@
 package com.ynthm.common.web.config;
 
 import com.ynthm.common.web.enums.EnumeratorConverterFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -15,6 +17,7 @@ import java.util.Locale;
  * @author Ethan Wang
  * @version 1.0
  */
+@AutoConfigureBefore({WebMvcAutoConfiguration.class})
 @Configuration
 public class WebMvcConfig {
 

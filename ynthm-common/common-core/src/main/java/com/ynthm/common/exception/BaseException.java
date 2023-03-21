@@ -14,6 +14,11 @@ public class BaseException extends RuntimeException {
     this.resultCode = BaseResultCode.ERROR;
   }
 
+  public BaseException(String message) {
+    super(message);
+    this.resultCode = BaseResultCode.ERROR;
+  }
+
   public BaseException(ResultCode resultCode) {
     super(resultCode.getMessage());
     this.resultCode = resultCode;

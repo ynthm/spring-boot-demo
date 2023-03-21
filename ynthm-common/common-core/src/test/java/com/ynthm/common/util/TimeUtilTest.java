@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -157,5 +158,37 @@ class TimeUtilTest {
     }
 
     return result;
+  }
+
+  @Test
+  void testOfUtc() {
+    System.out.println(TimeUtil.periodDay(Duration.ofSeconds(70)));
+    LocalDateTime localDateTime1 = LocalDateTime.of(2019, 11, 15, 0, 0);
+    LocalDateTime localDateTime2 = LocalDateTime.of(2020, 12, 16, 10, 30);
+
+    System.out.println(localDateTime1.until(localDateTime2, ChronoUnit.HOURS));
+
+    Duration d = Duration.between(localDateTime1, localDateTime2);
+    System.out.println(d.get(ChronoUnit.SECONDS));
+    System.out.println("days:" + d.toDays());
+    System.out.println("hours:" + d.toHours());
+    System.out.println("minutes:" + d.toMinutes());
+    System.out.println("millis:" + d.toMillis());
+
+    long hours = d.minusDays(d.toDays()).toHours();
+    System.out.println(hours);
+    System.out.println(d.minusDays(d.toDays()).minusHours(hours).toMinutes());
+
+    Period period = Period.between(localDateTime1.toLocalDate(), localDateTime2.toLocalDate());
+    Duration duration =
+        Duration.between(localDateTime1.toLocalTime(), localDateTime2.toLocalTime());
+    System.out.println(period.getYears() + "年");
+    System.out.println(period.getMonths() + "月");
+    System.out.println(period.getDays() + "日");
+
+    System.out.println(duration.toHours());
+    System.out.println(duration.toMinutes());
+    System.out.println(duration.get(ChronoUnit.SECONDS));
+    System.out.println(duration.toNanos());
   }
 }
