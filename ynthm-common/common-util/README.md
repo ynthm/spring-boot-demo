@@ -1,5 +1,0 @@
-## CGlib
-
-## bouncycastle
-
-## httpclient

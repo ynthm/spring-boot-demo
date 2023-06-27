@@ -1,6 +1,0 @@
-com.ynthm.common.web.config.GlobalExceptionHandler
-com.ynthm.common.web.config.MyResponseBodyAdvice
-com.ynthm.common.web.config.JacksonConfig
-com.ynthm.common.web.util.I18nUtil
-com.ynthm.common.web.util.SpringContextHolder
-com.ynthm.common.web.config.WebMvcConfig
